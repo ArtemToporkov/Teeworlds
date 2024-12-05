@@ -26,6 +26,28 @@ class ServerUI(QMainWindow):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #013220; 
+            }
+            QLabel, QCheckBox, QPushButton {
+                color: white; 
+                font-size: 25px;
+            }
+            QPushButton {
+                background-color: #026b2e;
+                border: 1px solid white;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QPushButton:hover {
+                background-color: #028c38;
+            }
+            QCheckBox {
+                margin-left: 10px;
+            }
+        """)
+
         # Основной layout
         layout = QVBoxLayout()
         central_widget.setLayout(layout)
@@ -38,7 +60,8 @@ class ServerUI(QMainWindow):
         self.update_button_image()
         layout.addWidget(self.start_server_btn, alignment=Qt.AlignCenter)
 
-        self.random_items_checkbox = QCheckBox("Bufs")
+        # Тумблер для рандомных предметов
+        self.random_items_checkbox = QCheckBox("Enable Buffs")
         self.random_items_checkbox.setChecked(False)
         self.random_items_checkbox.stateChanged.connect(self.toggle_random_items)
 
@@ -46,13 +69,13 @@ class ServerUI(QMainWindow):
         self.ip_label = QLabel(f"IP: {self.server.ip}")
         self.port_label = QLabel(f"Port: {self.server.port}")
         self.map_label = QLabel("Map: None")
-        # self.status_label = QLabel("Status: Server is not running")
         self.mode_label = QLabel("Mode: Single")
 
-        # Добавляем лейблы на экран
-        for label in [self.ip_label, self.port_label, self.map_label, self.mode_label, self.random_items_checkbox]:
-            layout.addWidget(label, alignment=Qt.AlignCenter)
+        #Помещаем эллементы на экран
+        for widget in [self.ip_label, self.port_label, self.map_label, self.mode_label, self.random_items_checkbox]:
+            layout.addWidget(widget, alignment=Qt.AlignCenter)
 
+        # Кнопка выбора карты
         select_map_btn = QPushButton("Select Map")
         select_map_btn.clicked.connect(self.select_map)
         layout.addWidget(select_map_btn, alignment=Qt.AlignCenter)
@@ -122,6 +145,7 @@ class ServerUI(QMainWindow):
         ui = ServerUI()
         ui.show()
         sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     ServerUI.run()
