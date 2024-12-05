@@ -1,6 +1,6 @@
 import pygame
 from pathlib import Path
-from game.constants import FPS
+from game.constants import FPS, BACKGROUND_WIDTH, BACKGROUND_HEIGHT
 from game.entities.Player import Player, States
 
 
@@ -8,16 +8,20 @@ class Game:
     def __init__(self, screen: pygame.display):
         self.running = True
         self.screen = screen
+        bg_path = Path(__file__).parent.parent / 'assets' / 'background.png'
+        self.background = pygame.transform.scale(pygame.image.load(bg_path), (BACKGROUND_WIDTH, BACKGROUND_HEIGHT))
+        self.clock = pygame.time.Clock()  # для фпс
         self.entities = []
         # TODO: self.map = Map()
         self.player = Player(100, 100, 48, 48)
 
     def run(self):
         while self.running:
-            self.screen.fill((0, 0, 0))
+            self.draw_bg()
             self.player.draw(self.screen)
             self.process_controls(pygame.event.get())
             pygame.display.flip()
+            self.clock.tick(FPS)
 
     def process_controls(self, events: list[pygame.event.Event]):
         for event in events:
@@ -36,6 +40,9 @@ class Game:
         #   self.player.jump()
         else:
             self.player.state = States.STANDING
+
+    def draw_bg(self):
+        self.screen.blit(self.background, (0, 0))
 
 
 
