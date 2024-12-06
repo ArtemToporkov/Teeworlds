@@ -14,7 +14,7 @@ class Game:
         self.clock = pygame.time.Clock()  # для фпс
         self.entities = []
         self.map = Map()
-        self.player = Player(100, 100, 48, 48)
+        self.player = Player(100, 250, 48, 48)
 
     def run(self):
         while self.running:
@@ -35,9 +35,7 @@ class Game:
         elif pressed_keys[pygame.K_d]:
             self.player.state = States.RUNNING_RIGHT
             self.player.move_right()
-        # TODO:
-        # elif pressed_keys[pygame.K_w]:
-        #   self.player.jump()
+        # TODO: elif pressed_keys[pygame.K_w]: ...
         else:
             self.player.state = States.STANDING
 

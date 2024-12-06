@@ -1,8 +1,18 @@
+import pygame
+
 from game.entities.map.map_block import MapBlock
 import pygame as pg
 from geometry.Vector import Vector
 from game.constants import ASSETS_PATH
 from os.path import join
+from typing import Type
+from enum import IntEnum
+
+
+class MapData(IntEnum):
+    SPAWN_POSITION = 0
+    BLOCKS = 1
+    TILE_SIZE = 2
 
 
 class Map:
@@ -15,32 +25,31 @@ class Map:
         self.image = pg.transform.scale(self.image, (800, 600))
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls: Type['Map'], data: dict) -> 'Map':
         new_map = cls()
-        new_map.spawn_position = Vector(*data["spawn_position"])
-        new_map.tile_size = data["tile_size"]
+        new_map.spawn_position = Vector(*data[MapData.SPAWN_POSITION])
+        new_map.tile_size = data[MapData.TILE_SIZE]
         new_map.blocks = {
             tuple(map(float, pos)): MapBlock.from_dict(block_data)
-            for pos, block_data in data["blocks"].items()
+            for pos, block_data in data[MapData.BLOCKS].items()
         }
         return new_map
 
     @classmethod
-    def load_from_file(cls, filepath):
+    def load_from_file(cls: Type['Map'], filepath: str) -> 'Map':
         import json
-
         with open(filepath, "r") as f:
             data = json.load(f)
         return cls.from_dict(data)
 
-    def to_dict(self):
+    def to_dict(self) -> dict[MapData, tuple | dict | int]:
         return {
-            "spawn_position": self.spawn_position.to_tuple(),
-            "blocks": {pos: block.to_dict() for pos, block in self.blocks.items()},
-            "tile_size": self.tile_size,
+            MapData.SPAWN_POSITION: self.spawn_position.to_tuple(),
+            MapData.BLOCKS: {pos: block.to_dict() for pos, block in self.blocks.items()},
+            MapData.TILE_SIZE: self.tile_size,
         }
 
-    def draw(self, screen, center: Vector):
+    def draw(self, screen: pygame.display, center: Vector) -> None:
         x = (-(center // 2) % (self.image.get_width())).x
         y = (-(center // 2) % (self.image.get_height())).y
         top_left = Vector(x, y)

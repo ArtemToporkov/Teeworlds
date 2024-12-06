@@ -1,7 +1,7 @@
 import os
 
 
-def find_assets_folder():
+def _find_assets_folder():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     while current_dir:
         assets_path = os.path.join(current_dir, "assets")
@@ -15,4 +15,4 @@ FPS = 60
 MOVEMENT_SPEED = 7
 BACKGROUND_WIDTH = 1280
 BACKGROUND_HEIGHT = 720
-ASSETS_PATH = find_assets_folder()
+ASSETS_PATH = _find_assets_folder()
