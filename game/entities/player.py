@@ -1,7 +1,7 @@
 import pygame
 from pathlib import Path
 
-from game.entities.Entity import Entity
+from game.entities.entity import Entity
 from geometry.Vector import Vector
 from enum import IntEnum
 

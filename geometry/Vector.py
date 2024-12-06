@@ -59,3 +59,6 @@ class Vector:
     @property
     def coordinates(self):
         return self.x, self.y
+
+    def to_tuple(self):
+        return self.x, self.y

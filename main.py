@@ -1,4 +1,4 @@
-from game.Game import Game
+from game.game import Game
 from pygame import display
 
 if __name__ == '__main__':
