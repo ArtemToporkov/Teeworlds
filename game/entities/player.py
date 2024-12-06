@@ -1,16 +1,18 @@
+import os
+
 import pygame
 from pathlib import Path
 
-from game.entities.Entity import Entity
+from game.entities.entity import Entity
 from geometry.Vector import Vector
-from enum import IntEnum
+from enum import IntEnum, auto
 
 
 class States(IntEnum):
-    STANDING = 0
-    RUNNING_RIGHT = 1
-    RUNNING_LEFT = 2
-    JUMPING = 3
+    STANDING = auto()
+    RUNNING_RIGHT = auto()
+    RUNNING_LEFT = auto()
+    JUMPING = auto()
 
 
 class Player(Entity):
@@ -22,14 +24,14 @@ class Player(Entity):
         self.state = States.STANDING
 
         self.current_running_frame = 0
-        self.running_frames = []
-        for i in range(27):
-            frame_path = Path(__file__).parent.parent.parent / 'assets' / 'player' / 'running' / f"{i + 1}.png"
-            frame = pygame.image.load(frame_path)
-            frame = pygame.transform.scale(frame, (width, height))
-            self.running_frames.append(frame)
+        self.running_frames = self.create_frames_list(
+            Path(__file__).parent.parent.parent / 'assets' / 'player' / 'running'
+        )
 
-        # TODO: self.jumping_frames ...
+        self.current_jumping_frame = 0
+        self.jumping_frames = self.create_frames_list(
+            Path(__file__).parent.parent.parent / 'assets' / 'player' / 'jumping'
+        )
 
     def draw(self, screen: pygame.display):
         match self.state:
@@ -45,14 +47,35 @@ class Player(Entity):
             case _:
                 pass
 
-    def move_left(self):
+    def move_left(self) -> None:
         self.move(Vector(-self.movement_speed, 0))
 
-    def move_right(self):
+    def move_right(self) -> None:
         self.move(Vector(self.movement_speed, 0))
 
-    def _update_running_frame(self):
+    def jump(self) -> None:
+        pass
+
+    def create_frames_list(self, frames_path: Path) -> list[pygame.image]:
+        frames = []
+        for frame_file in os.listdir(frames_path):
+            frame = pygame.image.load(frames_path / frame_file)
+            frame = pygame.transform.scale(frame, (self.width, self.height))
+            frames.append(frame)
+        return frames
+
+    def _update_running_frame(self) -> None:
         self.current_running_frame += 1
-        if self.current_running_frame == 27:  # для того чтобы слишком быстро не бежал
+        if self.current_running_frame == 27:
             self.current_running_frame = 0
+
+    def _update_jumping_frame(self) -> None:
+        if self.state != States.JUMPING:
+            self.current_jumping_frame = 0
+        elif self.current_jumping_frame == 11:
+            return
+        else:
+            self.current_jumping_frame += 1
+
+
 

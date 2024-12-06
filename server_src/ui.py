@@ -71,7 +71,7 @@ class ServerUI(QMainWindow):
         self.map_label = QLabel("Map: None")
         self.mode_label = QLabel("Mode: Single")
 
-        #Помещаем эллементы на экран
+        # Помещаем эллементы на экран
         for widget in [self.ip_label, self.port_label, self.map_label, self.mode_label, self.random_items_checkbox]:
             layout.addWidget(widget, alignment=Qt.AlignCenter)
 

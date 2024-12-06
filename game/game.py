@@ -1,24 +1,24 @@
 import pygame
 from pathlib import Path
 from game.constants import FPS, BACKGROUND_WIDTH, BACKGROUND_HEIGHT
-from game.entities.Player import Player, States
+from game.entities.player import Player, States
+from game.entities.map.map import Map
 
 
 class Game:
     def __init__(self, screen: pygame.display):
         self.running = True
         self.screen = screen
-        bg_path = Path(__file__).parent.parent / 'assets' / 'background.png'
-        self.background = pygame.transform.scale(pygame.image.load(bg_path), (BACKGROUND_WIDTH, BACKGROUND_HEIGHT))
+        # bg_path = Path(__file__).parent.parent / 'assets' / 'background.png'
+        # self.background = pygame.transform.scale(pygame.image.load(bg_path), (BACKGROUND_WIDTH, BACKGROUND_HEIGHT))
         self.clock = pygame.time.Clock()  # для фпс
         self.entities = []
-        # TODO: self.map = Map()
-        self.player = Player(100, 100, 48, 48)
+        self.map = Map()
+        self.player = Player(100, 250, 48, 48)
 
     def run(self):
         while self.running:
-            self.draw_bg()
-            self.player.draw(self.screen)
+            self.draw()
             self.process_controls(pygame.event.get())
             pygame.display.flip()
             self.clock.tick(FPS)
@@ -35,14 +35,13 @@ class Game:
         elif pressed_keys[pygame.K_d]:
             self.player.state = States.RUNNING_RIGHT
             self.player.move_right()
-        # TODO:
-        # elif pressed_keys[pygame.K_w]:
-        #   self.player.jump()
+        # TODO: elif pressed_keys[pygame.K_w]: ...
         else:
             self.player.state = States.STANDING
 
-    def draw_bg(self):
-        self.screen.blit(self.background, (0, 0))
+    def draw(self):
+        self.map.draw(self.screen, self.player.position)
+        self.player.draw(self.screen)
 
 
 
