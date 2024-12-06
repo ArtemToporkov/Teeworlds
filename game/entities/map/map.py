@@ -1,18 +1,13 @@
 import pygame
 
-from game.entities.map.map_block import MapBlock
+from game.entities.map.map_block import Platform
 import pygame as pg
+
+from game.enums import MapData
 from geometry.Vector import Vector
 from game.constants import ASSETS_PATH
 from os.path import join
 from typing import Type
-from enum import IntEnum
-
-
-class MapData(IntEnum):
-    SPAWN_POSITION = 0
-    BLOCKS = 1
-    TILE_SIZE = 2
 
 
 class Map:
@@ -30,7 +25,7 @@ class Map:
         new_map.spawn_position = Vector(*data[MapData.SPAWN_POSITION])
         new_map.tile_size = data[MapData.TILE_SIZE]
         new_map.blocks = {
-            tuple(map(float, pos)): MapBlock.from_dict(block_data)
+            tuple(map(float, pos)): Platform.from_dict(block_data)
             for pos, block_data in data[MapData.BLOCKS].items()
         }
         return new_map

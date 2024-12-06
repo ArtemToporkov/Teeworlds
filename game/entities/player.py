@@ -3,25 +3,22 @@ import os
 import pygame
 from pathlib import Path
 
-from game.entities.entity import Entity
+from game.constants import MOVEMENT_SPEED
+from game.entities.game_object import GameObject
+from game.enums import PlayerStates
 from geometry.Vector import Vector
 from enum import IntEnum, auto
 
 
-class States(IntEnum):
-    STANDING = auto()
-    RUNNING_RIGHT = auto()
-    RUNNING_LEFT = auto()
-    JUMPING = auto()
 
-
-class Player(Entity):
+class Player(GameObject):
     def __init__(self, x, y, width, height):
         player_sprite_path = Path(__file__).parent.parent.parent / 'assets' / 'player' / 'standing.png'
         super().__init__(x, y, width, height, player_sprite_path)
         self.sprite = pygame.image.load(player_sprite_path)
         self.sprite = pygame.transform.scale(self.sprite, (width, height))
-        self.state = States.STANDING
+        self.state = PlayerStates.STANDING
+        self.movement_speed = MOVEMENT_SPEED
 
         self.current_running_frame = 0
         self.running_frames = self.create_frames_list(
@@ -35,14 +32,14 @@ class Player(Entity):
 
     def draw(self, screen: pygame.display):
         match self.state:
-            case States.RUNNING_RIGHT | States.RUNNING_LEFT:
+            case PlayerStates.RUNNING_RIGHT | PlayerStates.RUNNING_LEFT:
                 frame = self.running_frames[self.current_running_frame]
                 frame = pygame.transform.flip(frame, True, False) \
-                    if self.state == States.RUNNING_LEFT \
+                    if self.state == PlayerStates.RUNNING_LEFT \
                     else frame
                 screen.blit(frame, (self.position.x, self.position.y, self.width, self.height))
                 self._update_running_frame()
-            case States.STANDING:
+            case PlayerStates.STANDING:
                 screen.blit(self.sprite, (self.position.x, self.position.y, self.width, self.height))
             case _:
                 pass
@@ -58,7 +55,10 @@ class Player(Entity):
 
     def create_frames_list(self, frames_path: Path) -> list[pygame.image]:
         frames = []
-        for frame_file in os.listdir(frames_path):
+        for frame_file in sorted(
+                os.listdir(frames_path), key=lambda file_name: int(file_name.split('.')[0])
+        ):  # сортировка по номеру кадра, название файла: [номер кадра].png
+            print(frame_file)
             frame = pygame.image.load(frames_path / frame_file)
             frame = pygame.transform.scale(frame, (self.width, self.height))
             frames.append(frame)
@@ -70,7 +70,7 @@ class Player(Entity):
             self.current_running_frame = 0
 
     def _update_jumping_frame(self) -> None:
-        if self.state != States.JUMPING:
+        if self.state != PlayerStates.JUMPING:
             self.current_jumping_frame = 0
         elif self.current_jumping_frame == 11:
             return

@@ -1,8 +1,9 @@
 import pygame
 from pathlib import Path
 from game.constants import FPS, BACKGROUND_WIDTH, BACKGROUND_HEIGHT
-from game.entities.player import Player, States
 from game.entities.map.map import Map
+from game.entities.player import Player
+from game.enums import PlayerStates
 
 
 class Game:
@@ -30,14 +31,14 @@ class Game:
                 quit()
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[pygame.K_a]:
-            self.player.state = States.RUNNING_LEFT
+            self.player.state = PlayerStates.RUNNING_LEFT
             self.player.move_left()
         elif pressed_keys[pygame.K_d]:
-            self.player.state = States.RUNNING_RIGHT
+            self.player.state = PlayerStates.RUNNING_RIGHT
             self.player.move_right()
         # TODO: elif pressed_keys[pygame.K_w]: ...
         else:
-            self.player.state = States.STANDING
+            self.player.state = PlayerStates.STANDING
 
     def draw(self):
         self.map.draw(self.screen, self.player.position)
