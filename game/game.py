@@ -7,7 +7,6 @@ from game.entities.player import Player
 from game.enums import PlayerStates
 
 
-
 class Game:
     def __init__(self, screen: pygame.display):
         self.running = True

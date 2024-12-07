@@ -138,6 +138,7 @@ class GameObject(SerializationMixin, ToolsMixin):
         self.height = height
         self.size = Vector(width, height)
         self.velocity = Vector(0, 0)
+        self.hitbox_color = (255, 0, 0)
 
         self.sprite_path = sprite_path
         self.image = ImageLoader.load_image(sprite_path, width, height)
@@ -154,8 +155,13 @@ class GameObject(SerializationMixin, ToolsMixin):
         self.is_landed = False
 
     def intersects(self, other) -> bool:
-        return (max(self.top_left.x, other.top_left.x) <= min(self.bottom_right.x, other.bottom_right.x)
-                and max(self.top_left.y, other.top_left.y) <= min(self.bottom_right.y, other.bottom_right.y))
+        result = True
+        if self.position.x > other.position.x + other.width or self.position.x + self.width < other.position.x:
+            result = False
+        if self.position.y > other.position.y + other.height or self.position.y + self.height < other.position.y:
+            result = False
+        self.hitbox_color = (255, 0, 0) if not result else (0, 255, 0)
+        return result
 
     def move(self, move_vector: Vector) -> None:
         self.position += move_vector
