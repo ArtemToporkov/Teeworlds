@@ -13,6 +13,8 @@ def _find_assets_folder():
 
 FPS = 60
 MOVEMENT_SPEED = 7
+WINDOW_WIDTH = 640
+WINDOW_HEIGHT = 480
 BACKGROUND_WIDTH = 1280
 BACKGROUND_HEIGHT = 720
 ASSETS_PATH = _find_assets_folder()

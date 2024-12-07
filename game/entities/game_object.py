@@ -1,6 +1,7 @@
 from game.enums import GameObjectData
 from geometry.Vector import Vector
 import os
+from game.constants import WINDOW_HEIGHT, WINDOW_WIDTH
 
 
 class GameObject:
@@ -20,6 +21,13 @@ class GameObject:
 
     def move(self, move_vector: Vector) -> None:
         self.position += move_vector
+
+    def get_coordinates_offset_by_center(self, center: Vector) -> Vector:
+        position = self.position - center + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
+        return position
+
+    def get_sprite_offset_to_its_center(self) -> Vector:
+        return Vector(-self.width / 2, -self.height / 2)
 
     def to_dict(self):
         return {

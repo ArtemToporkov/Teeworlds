@@ -15,7 +15,7 @@ class Game:
         self.clock = pygame.time.Clock()  # для фпс
         self.entities = []
         self.map = Map()
-        self.player = Player(100, 250, 48, 48)
+        self.player = Player(100,  100, 48, 48)
 
     def run(self):
         while self.running:
@@ -42,7 +42,9 @@ class Game:
 
     def draw(self):
         self.map.draw(self.screen, self.player.position)
-        self.player.draw(self.screen)
+        self.player.draw(self.screen, self.player.position)
+        new_position = self.player.get_coordinates_offset_by_center(self.player.position)
+        pygame.draw.circle(self.screen, (0, 255, 0), (new_position.x, new_position.y), 5)
 
 
 

@@ -1,6 +1,6 @@
 import pygame
 
-from game.entities.map.map_block import Platform
+from game.entities.map.platform import Platform
 import pygame as pg
 
 from game.enums import MapData
@@ -8,11 +8,13 @@ from geometry.Vector import Vector
 from game.constants import ASSETS_PATH
 from os.path import join
 from typing import Type
+from pathlib import Path
 
 
 class Map:
     def __init__(self):
-        self.blocks = dict()
+        self.blocks = {(200, 200): Platform(
+            200, 200, 200, 200, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png')}
         self.tile_size = 50
         self.spawn_position = Vector(0, 0)
         self.image = pg.image.load(join(ASSETS_PATH, "maps", "background.png"))
@@ -58,3 +60,4 @@ class Map:
         )
         for block in self.blocks.values():
             block.draw(screen, center)
+

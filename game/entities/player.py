@@ -10,7 +10,6 @@ from geometry.Vector import Vector
 from enum import IntEnum, auto
 
 
-
 class Player(GameObject):
     def __init__(self, x, y, width, height):
         player_sprite_path = Path(__file__).parent.parent.parent / 'assets' / 'player' / 'standing.png'
@@ -30,17 +29,18 @@ class Player(GameObject):
             Path(__file__).parent.parent.parent / 'assets' / 'player' / 'jumping'
         )
 
-    def draw(self, screen: pygame.display):
+    def draw(self, screen: pygame.display, center: Vector):
+        new_position = self.get_coordinates_offset_by_center(center) + self.get_sprite_offset_to_its_center()
         match self.state:
             case PlayerStates.RUNNING_RIGHT | PlayerStates.RUNNING_LEFT:
                 frame = self.running_frames[self.current_running_frame]
                 frame = pygame.transform.flip(frame, True, False) \
                     if self.state == PlayerStates.RUNNING_LEFT \
                     else frame
-                screen.blit(frame, (self.position.x, self.position.y, self.width, self.height))
+                screen.blit(frame, (new_position.x, new_position.y, self.width, self.height))
                 self._update_running_frame()
             case PlayerStates.STANDING:
-                screen.blit(self.sprite, (self.position.x, self.position.y, self.width, self.height))
+                screen.blit(self.sprite, (new_position.x, new_position.y, self.width, self.height))
             case _:
                 pass
 
