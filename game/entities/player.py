@@ -1,10 +1,13 @@
 import os
+import pygame as pg
 
 import pygame
 from pathlib import Path
 
-from game.constants import MOVEMENT_SPEED
+from game.constants import BACKGROUND_HEIGHT, BACKGROUND_WIDTH
+from game.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game.entities.game_object import GameObject
+from game.entities.guns.weapons import Pistol, ShotGun, Rocket, Egg
 from game.enums import PlayerStates
 from geometry.Vector import Vector
 from enum import IntEnum, auto
@@ -19,6 +22,18 @@ class Player(GameObject):
         self.sprite = pygame.transform.scale(self.sprite, (width, height))
         self.state = PlayerStates.STANDING
         self.movement_speed = MOVEMENT_SPEED
+
+        self.weapons = [
+            Pistol(0, 0, 50, os.path.join(ASSETS_PATH, "weapons", "pistol.png")),
+            ShotGun(0, 0, 50, os.path.join(ASSETS_PATH, "weapons", "shotgun.png")),
+            Rocket(0, 0, 75, os.path.join(ASSETS_PATH, "weapons", "rpg.png")),
+            Egg(0, 0, 50, None),
+        ]
+        self.current_weapon = 0
+        self.cooldown = 30
+
+        self.hp = 100 + 100
+        self.alive = True
 
         self.current_running_frame = 0
         self.running_frames = self.create_frames_list(
@@ -77,5 +92,17 @@ class Player(GameObject):
         else:
             self.current_jumping_frame += 1
 
+    def set_direction(self):
+        self.direction = (
+            Vector(*pg.mouse.get_pos()) - Vector(BACKGROUND_WIDTH, BACKGROUND_HEIGHT) / 2
+        ).normalize()
 
-
+    def shoot(self):
+        if self.cooldown < 0:
+            self.coldown = 30
+            bullets = self.weapons[self.current_weapon].get_bullet()
+            self.velocity += (
+                -self.direction * self.weapons[self.current_weapon].kickback
+            )
+            return bullets
+        return []

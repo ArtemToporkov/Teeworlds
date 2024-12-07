@@ -1,4 +1,5 @@
 import os
+from geometry.Vector import Vector
 
 
 def _find_assets_folder():
@@ -16,3 +17,4 @@ MOVEMENT_SPEED = 7
 BACKGROUND_WIDTH = 1280
 BACKGROUND_HEIGHT = 720
 ASSETS_PATH = _find_assets_folder()
+GRAVITY = Vector(0, 0.6)
