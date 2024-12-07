@@ -1,8 +1,7 @@
 import pygame
 from pathlib import Path
-from game.constants import FPS, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, HITBOXES_MODE, MOVEMENT_SPEED
+from game.constants import FPS, BACKGROUND_WIDTH, BACKGROUND_HEIGHT
 from game.entities.map.map import Map
-from game.entities.map.platform import Platform
 from game.entities.player import Player
 from game.enums import PlayerStates
 
@@ -14,6 +13,9 @@ class Game:
         # bg_path = Path(__file__).parent.parent / 'assets' / 'background.png'
         # self.background = pygame.transform.scale(pygame.image.load(bg_path), (BACKGROUND_WIDTH, BACKGROUND_HEIGHT))
         self.clock = pygame.time.Clock()  # для фпс
+        self.entities = []
+        self.bullets = []
+        self.players = dict()
         self.map = Map()
         self.player = Player(100,  100, 48, 48)
         self.entities = [self.player, *self.map.blocks.values()]
@@ -30,6 +32,19 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
                 quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # ЛКМ
+                    bullets = self.player.shoot()
+                    # if MULTIPLAYER:
+                    #     for bullet in bullets:
+                    #         self.network.send(Wrap(bullet))
+                    for bullet in bullets:
+                        self.bullets.append(bullet)
+                        bullet.load_images()
+
+                elif event.button == 3:  # ПКМ
+                    self.player.current_weapon = (self.player.current_weapon + 1) % len(self.player.weapons)
+
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[pygame.K_a]:
             self.player.state = PlayerStates.RUNNING_LEFT
