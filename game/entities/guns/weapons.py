@@ -11,10 +11,21 @@ import random
 
 BULLETS_PATH = os.path.join(ASSETS_PATH, "weapons", "bullets")
 
+class ImageLoader:
+    @staticmethod
+    def load_sprite(sprite_path, width):
+        sprite = None
+        if sprite_path:
+            sprite = pg.image.load(sprite_path)
+            h = width * sprite.get_height() / sprite.get_width()
+            sprite = pg.transform.scale(pg.image.load(sprite_path), (width, h))
+        return sprite
+
+
 class Weapon(GameObject):
     def __init__(self, x, y, width, sprite_path):
         super().__init__(x, y, width=width, sprite_path=sprite_path)
-        self.sprite = None
+        self.image = ImageLoader.load_sprite(sprite_path, width)
         self.kickback = 0
         self.direction = Vector(0, 0)
         self.dist = 30
@@ -24,12 +35,13 @@ class Weapon(GameObject):
         pass
 
     def draw(self, screen, center):
-        if not self.sprite:
+        if not self.image:
             return
         angle = -math.atan2(self.direction.y, self.direction.x) / math.pi * 180
+        # new_position = self.get_coordinates_offset_by_center(center)
         pos, _, _ = self.convert_coordinates(center)
-        rect = self.sprite.get_rect(center=pos.tuple)
-        image = self.sprite
+        rect = self.image.get_rect(center=pos.to_tuple())
+        image = self.image
         if angle > 90 or angle < -90:
             image = pg.transform.flip(image, False, True)
         image = pg.transform.rotate(image, angle)

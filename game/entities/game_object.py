@@ -7,27 +7,6 @@ from game.constants import WINDOW_HEIGHT, WINDOW_WIDTH
 import pygame as pg
 
 
-class GameObject:
-    def __init__(self, x, y, width=0, height=0, sprite_path: os.path = None):
-        self.position = Vector(x, y)
-        self.width = width
-        self.height = height
-        self.sprite_path = sprite_path
-        self.hitbox_color = (255, 0, 0)
-
-    def intersects(self, other) -> bool:
-        result = True
-        if self.position.x > other.position.x + other.width or self.position.x + self.width < other.position.x:
-            result = False
-        if self.position.y > other.position.y + other.height or self.position.y + self.height < other.position.y:
-            result = False
-        self.hitbox_color = (255, 0, 0) if not result else (0, 255, 0)
-        return result
-
-    def get_coordinates_offset_by_center(self, center: Vector) -> Vector:
-        position = self.position - center + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
-        return position
-
 class SerializationMixin:
     def to_dict(self):
         return {
@@ -51,7 +30,7 @@ class SerializationMixin:
 
 class ToolsMixin:
     def convert_coordinates(self, center):
-        position = self.position - center + Vector(BACKGROUND_WIDTH, BACKGROUND_HEIGHT) / 2
+        position = self.position - center + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
         top_left = position - self.size / 2
         bottom_right = position + self.size / 2
 
@@ -144,6 +123,8 @@ class GameObject(SerializationMixin, ToolsMixin):
         self.image = ImageLoader.load_image(sprite_path, width, height)
         self.frames = 0
 
+        self.alive = True
+
         self.top_right = Vector(self.position.x + self.width, self.position.y + self.height)
         self.bottom_right = Vector(self.position.x + self.width, self.position.y - self.height)
         self.bottom_left = Vector(self.position.x - self.width, self.position.y - self.height)
@@ -169,7 +150,6 @@ class GameObject(SerializationMixin, ToolsMixin):
     def get_coordinates_offset_by_center(self, center: Vector) -> Vector:
         position = self.position - center + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
         return position
-
 
     def update(self):
         if self.velocity.length() > 25:
@@ -199,7 +179,7 @@ class GameObject(SerializationMixin, ToolsMixin):
             screen.blit(self.image, rect)
 
     def draw_hitbox(self, screen):
-        # Рисование хитбокса
+        # Рисование хитбокса <лишнее.>
         pg.draw.rect(screen, self.hitbox_color, (self.position.x, self.position.y, self.width, self.height), 2)
 
     def get_particle(self):
