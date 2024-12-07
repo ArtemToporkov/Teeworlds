@@ -1,4 +1,5 @@
 import os
+from geometry.Vector import Vector
 
 
 def _find_assets_folder():
@@ -19,4 +20,4 @@ BACKGROUND_WIDTH = 1280
 BACKGROUND_HEIGHT = 720
 ASSETS_PATH = _find_assets_folder()
 GRAVITY = Vector(0, 0.6)
-HITBOXES_MODE = True
+HITBOXES_MODE = False

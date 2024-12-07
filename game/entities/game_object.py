@@ -4,6 +4,7 @@ from game.constants import BACKGROUND_WIDTH, BACKGROUND_HEIGHT
 from game.constants import GRAVITY
 import os
 from game.constants import WINDOW_HEIGHT, WINDOW_WIDTH
+import pygame as pg
 
 
 class GameObject:
@@ -36,10 +37,6 @@ class SerializationMixin:
             GameObjectData.HEIGHT: self.height,
             GameObjectData.SPRITE_PATH: self.sprite_path
         }
-
-    def draw_hitbox(self, screen):
-        # Рисование хитбокса
-        pygame.draw.rect(screen, self.hitbox_color, (self.position.x, self.position.y, self.width, self.height), 2)
 
     @staticmethod
     def from_dict(data):
@@ -163,6 +160,11 @@ class GameObject(SerializationMixin, ToolsMixin):
     def move(self, move_vector: Vector) -> None:
         self.position += move_vector
 
+    def get_coordinates_offset_by_center(self, center: Vector) -> Vector:
+        position = self.position - center + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
+        return position
+
+
     def update(self):
         if self.velocity.length() > 25:
             self.velocity = self.velocity.normalize() * 25
@@ -189,6 +191,10 @@ class GameObject(SerializationMixin, ToolsMixin):
         rect = top_left.tuple + self.size.to_tuple
         if self.sprite_path is not None:
             screen.blit(self.image, rect)
+
+    def draw_hitbox(self, screen):
+        # Рисование хитбокса
+        pg.draw.rect(screen, self.hitbox_color, (self.position.x, self.position.y, self.width, self.height), 2)
 
     def get_particle(self):
         return None

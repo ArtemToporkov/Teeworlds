@@ -2,7 +2,7 @@ import os
 import pygame
 from pygame import Vector2
 
-from game.constants import MOVEMENT_SPEED
+from game.constants import MOVEMENT_SPEED, WINDOW_WIDTH, WINDOW_HEIGHT
 from game.entities.game_object import GameObject
 from game.entities.player import Player
 from geometry.Vector import Vector

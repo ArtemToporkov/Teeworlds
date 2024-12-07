@@ -1,9 +1,11 @@
 import pygame
 from pathlib import Path
-from game.constants import FPS, BACKGROUND_WIDTH, BACKGROUND_HEIGHT
+from game.constants import FPS, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, MOVEMENT_SPEED, HITBOXES_MODE
 from game.entities.map.map import Map
+from game.entities.map.platform import Platform
 from game.entities.player import Player
 from game.enums import PlayerStates
+
 
 
 class Game:

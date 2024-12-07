@@ -83,7 +83,7 @@ class Player(GameObject):
         for frame_file in sorted(
                 os.listdir(frames_path), key=lambda file_name: int(file_name.split('.')[0])
         ):  # сортировка по номеру кадра, название файла: [номер кадра].png
-            print(frame_file)
+            # print(frame_file)
             frame = pygame.image.load(frames_path / frame_file)
             frame = pygame.transform.scale(frame, (self.width, self.height))
             frames.append(frame)
