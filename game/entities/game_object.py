@@ -1,3 +1,5 @@
+import pygame
+
 from game.enums import GameObjectData
 from geometry.Vector import Vector
 import os
@@ -10,24 +12,20 @@ class GameObject:
         self.width = width
         self.height = height
         self.sprite_path = sprite_path
-        self.top_right = Vector(self.position.x + self.width, self.position.y + self.height)
-        self.bottom_right = Vector(self.position.x + self.width, self.position.y - self.height)
-        self.bottom_left = Vector(self.position.x - self.width, self.position.y - self.height)
-        self.top_left = Vector(self.position.x - self.width, self.position.y + self.height)
+        self.hitbox_color = (255, 0, 0)
 
     def intersects(self, other) -> bool:
-        return (max(self.top_left.x, other.top_left.x) <= min(self.bottom_right.x, other.bottom_right.x)
-                and max(self.top_left.y, other.top_left.y) <= min(self.bottom_right.y, other.bottom_right.y))
-
-    def move(self, move_vector: Vector) -> None:
-        self.position += move_vector
+        result = True
+        if self.position.x > other.position.x + other.width or self.position.x + self.width < other.position.x:
+            result = False
+        if self.position.y > other.position.y + other.height or self.position.y + self.height < other.position.y:
+            result = False
+        self.hitbox_color = (255, 0, 0) if not result else (0, 255, 0)
+        return result
 
     def get_coordinates_offset_by_center(self, center: Vector) -> Vector:
         position = self.position - center + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
         return position
-
-    def get_sprite_offset_to_its_center(self) -> Vector:
-        return Vector(-self.width / 2, -self.height / 2)
 
     def to_dict(self):
         return {
@@ -37,6 +35,10 @@ class GameObject:
             GameObjectData.HEIGHT: self.height,
             GameObjectData.SPRITE_PATH: self.sprite_path
         }
+    
+    def draw_hitbox(self, screen):
+        # Рисование хитбокса
+        pygame.draw.rect(screen, self.hitbox_color, (self.position.x, self.position.y, self.width, self.height), 2)
 
     @staticmethod
     def from_dict(data):

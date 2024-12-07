@@ -13,11 +13,13 @@ from enum import IntEnum, auto
 class Player(GameObject):
     def __init__(self, x, y, width, height):
         player_sprite_path = Path(__file__).parent.parent.parent / 'assets' / 'player' / 'standing.png'
-        super().__init__(x, y, width, height, player_sprite_path)
+        super().__init__(x, y, width=width, height=height, sprite_path=player_sprite_path)
         self.sprite = pygame.image.load(player_sprite_path)
         self.sprite = pygame.transform.scale(self.sprite, (width, height))
         self.state = PlayerStates.STANDING
         self.movement_speed = MOVEMENT_SPEED
+        self.move_force_vector = Vector(0, MOVEMENT_SPEED)
+        self.jumped = False
 
         self.current_running_frame = 0
         self.running_frames = self.create_frames_list(
@@ -30,7 +32,7 @@ class Player(GameObject):
         )
 
     def draw(self, screen: pygame.display, center: Vector):
-        new_position = self.get_coordinates_offset_by_center(center) + self.get_sprite_offset_to_its_center()
+        new_position = self.get_coordinates_offset_by_center(center)
         match self.state:
             case PlayerStates.RUNNING_RIGHT | PlayerStates.RUNNING_LEFT:
                 frame = self.running_frames[self.current_running_frame]
@@ -44,11 +46,18 @@ class Player(GameObject):
             case _:
                 pass
 
-    def move_left(self) -> None:
-        self.move(Vector(-self.movement_speed, 0))
+    def change_move_vector(self, x: int = None, y: int = None) -> None:
+        self.move_force_vector = Vector(
+            self.move_force_vector.x if not x else x,
+            self.move_force_vector.y if not y else y,
+        )
 
-    def move_right(self) -> None:
-        self.move(Vector(self.movement_speed, 0))
+    def move(self):
+        self.position += self.move_force_vector
+        self._calm_down_force_vector()
+
+    def move_by_coordinates(self, dx, dy):
+        self.position += Vector(dx, dy)
 
     def jump(self) -> None:
         pass
@@ -76,6 +85,26 @@ class Player(GameObject):
             return
         else:
             self.current_jumping_frame += 1
+
+    def _calm_down_force_vector(self) -> None:
+        self.move_force_vector = Vector(
+            self._calm_down_x(self.move_force_vector.x),
+            self._calm_down_y(self.move_force_vector.y)
+        )
+
+    @staticmethod
+    def _calm_down_x(coordinate: float) -> float:
+        if coordinate > 0:
+            coordinate -= 1
+        elif coordinate < 0:
+            coordinate += 1
+        return coordinate
+
+    @staticmethod
+    def _calm_down_y(coordinate: float) -> float:
+        if coordinate < 2*MOVEMENT_SPEED:
+            coordinate += 1
+        return coordinate
 
 
 
