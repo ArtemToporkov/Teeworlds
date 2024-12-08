@@ -135,7 +135,7 @@ class GameObject(SerializationMixin, ToolsMixin):
         self.collision_handler = CollisionHandler(self)
         self.is_landed = False
 
-    def intersects(self, other) -> bool:
+    def intersects(self, other: 'GameObject') -> bool:
         result = True
         if self.position.x > other.position.x + other.width or self.position.x + self.width < other.position.x:
             result = False
@@ -178,9 +178,15 @@ class GameObject(SerializationMixin, ToolsMixin):
         if self.sprite_path is not None:
             screen.blit(self.image, rect)
 
-    def draw_hitbox(self, screen):
-        # Рисование хитбокса <лишнее.>
-        pg.draw.rect(screen, self.hitbox_color, (self.position.x, self.position.y, self.width, self.height), 2)
+    def draw_hitbox(self, screen, center):
+        new_coordinates = self.get_coordinates_offset_by_center(center)
+        pg.draw.rect(screen, self.hitbox_color, (new_coordinates.x, new_coordinates.y, self.width, self.height), 2)
+
+    def interact(self, other: 'GameObject'):
+        if self.intersects(other):
+            self.hitbox_color = (0, 255, 0)
+        else:
+            self.hitbox_color = (255, 0, 0)
 
     def get_particle(self):
         return None

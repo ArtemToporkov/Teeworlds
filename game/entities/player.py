@@ -4,15 +4,15 @@ import pygame as pg
 import pygame
 from pathlib import Path
 
-from game.constants import BACKGROUND_HEIGHT, BACKGROUND_WIDTH, WINDOW_WIDTH, WINDOW_HEIGHT
+from pygame.key import ScancodeWrapper
+
+from game.constants import BACKGROUND_HEIGHT, BACKGROUND_WIDTH, WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, GRAVITY_Y
 from game.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game.entities.game_object import GameObject
 from game.entities.guns.bullets import Grenade
 from game.entities.guns.weapons import Pistol, ShotGun, Rocket, Egg
-from game.enums import PlayerStates
+from game.enums import PlayerStates, Collisions
 from geometry.Vector import Vector
-from enum import IntEnum, auto
-
 
 
 class Player(GameObject):
@@ -23,8 +23,9 @@ class Player(GameObject):
         self.sprite = pygame.transform.scale(self.sprite, (width, height))
         self.state = PlayerStates.STANDING
         self.movement_speed = MOVEMENT_SPEED
-        self.move_force_vector = Vector(0, MOVEMENT_SPEED)
+        self.move_force_vector = Vector(0, 0)
         self.jumped = False
+        self.in_air = False
 
         self.weapons = [
             Pistol(0, 0, 50, os.path.join(ASSETS_PATH, "weapons", "pistol.png")),
@@ -48,7 +49,7 @@ class Player(GameObject):
             Path(__file__).parent.parent.parent / 'assets' / 'player' / 'jumping'
         )
 
-    def draw(self, screen: pygame.display, center: Vector):
+    def draw(self, screen: pygame.display, center: Vector) -> None:
         new_position = self.get_coordinates_offset_by_center(center)
         self.weapons[self.current_weapon].draw(screen, center)
         match self.state:
@@ -59,16 +60,27 @@ class Player(GameObject):
                     else frame
                 screen.blit(frame, (new_position.x, new_position.y, self.width, self.height))
                 self._update_running_frame()
+            case PlayerStates.JUMPING:
+                frame = self.jumping_frames[self.current_jumping_frame]
+                frame = pygame.transform.flip(frame, True, False) \
+                    if self.state == PlayerStates.RUNNING_LEFT \
+                    else frame
+                screen.blit(frame, (new_position.x, new_position.y, self.width, self.height))
+                self._update_jumping_frame()
             case PlayerStates.STANDING:
                 screen.blit(self.sprite, (new_position.x, new_position.y, self.width, self.height))
             case _:
                 pass
 
-    def change_move_vector(self, x: int = None, y: int = None) -> None:
-        self.move_force_vector = Vector(
-            self.move_force_vector.x if not x else x,
-            self.move_force_vector.y if not y else y,
-        )
+    def predict_collisions(self, platforms: list['Platform']) -> dict[Collisions, bool]:
+        current_collisions = {
+            col: False for col in [Collisions.X_RIGHT, Collisions.X_LEFT, Collisions.Y_UP, Collisions.Y_DOWN]
+        }
+        for platform in platforms:
+            collisions = platform.get_collisions(self)
+            for key in collisions.keys():
+                current_collisions[key] = collisions[key] or current_collisions[key]
+        return current_collisions
 
     def update(self):
         # super().update()
@@ -100,8 +112,6 @@ class Player(GameObject):
         #         buff.update()
 
     def act(self, other):
-        # проходит по всем объектам с которыми может взаимодействовать игрок
-        # Ну и взаимодействует
         from game.entities.guns.bullets import Bullet, BlowingBullet
 
         if self is other:
@@ -139,10 +149,6 @@ class Player(GameObject):
         #     if intersecting:
         #         self.add_buff(other)
 
-    def move(self):
-        self.position += self.move_force_vector
-        self._calm_down_force_vector()
-
     def move_by_coordinates(self, dx, dy):
         self.position += Vector(dx, dy)
 
@@ -159,6 +165,54 @@ class Player(GameObject):
             frame = pygame.transform.scale(frame, (self.width, self.height))
             frames.append(frame)
         return frames
+
+    def process_keys_and_move(self, pressed_keys: ScancodeWrapper | list[bool], platforms: list['Platform']) -> None:
+        collisions = self.predict_collisions(platforms)
+        a_pressed, d_pressed, w_pressed = pressed_keys[pygame.K_a], pressed_keys[pygame.K_d], pressed_keys[pygame.K_w]
+        if not collisions[Collisions.Y_DOWN]:
+            self._add_to_move_vector(dy=GRAVITY_Y)
+        else:
+            self.jumped = False
+            self._change_move_vector(y=0)
+        if d_pressed:
+            if not collisions[Collisions.X_RIGHT]:
+                self.state = PlayerStates.RUNNING_RIGHT
+                self._change_move_vector(x=MOVEMENT_SPEED)
+            else:
+                self._stay()
+        elif a_pressed:
+            if not collisions[Collisions.X_LEFT]:
+                self.state = PlayerStates.RUNNING_LEFT
+                self._change_move_vector(x=-MOVEMENT_SPEED)
+            else:
+                self._stay()
+        else:
+            self._stay()
+
+        if not collisions[Collisions.Y_UP]:
+            if w_pressed and not self.jumped:
+                self._change_move_vector(y=-2 * MOVEMENT_SPEED)
+                self.state = PlayerStates.JUMPING
+                self.jumped = True
+
+
+
+
+        print(collisions[Collisions.Y_DOWN])
+        self.move(self.move_force_vector)
+
+    def _stay(self) -> None:
+        self.state = PlayerStates.STANDING
+        self._change_move_vector(x=0)
+
+    def _change_move_vector(self, x: float = None, y: float = None) -> None:
+        self.move_force_vector = Vector(
+            self.move_force_vector.x if x is None else x,
+            self.move_force_vector.y if y is None else y,
+        )
+
+    def _add_to_move_vector(self, dx: float = None, dy: float = None) -> None:
+        self.move_force_vector += Vector(dx if dx else 0, dy if dy else 0)
 
     def _update_running_frame(self) -> None:
         self.current_running_frame += 1
@@ -177,28 +231,6 @@ class Player(GameObject):
         self.direction = (
             Vector(*pg.mouse.get_pos()) - Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
         ).normalize()
-
-    def _calm_down_force_vector(self) -> None:
-        self.move_force_vector = Vector(
-            self._calm_down_x(self.move_force_vector.x),
-            self._calm_down_y(self.move_force_vector.y)
-        )
-
-    @staticmethod
-    def _calm_down_x(coordinate: float) -> float:
-        if coordinate > 0:
-            coordinate -= 1
-        elif coordinate < 0:
-            coordinate += 1
-        return coordinate
-
-    @staticmethod
-    def _calm_down_y(coordinate: float) -> float:
-        if coordinate < 2*MOVEMENT_SPEED:
-            coordinate += 1
-        return coordinate
-
-
 
     def shoot(self):
         if self.cooldown < 0:

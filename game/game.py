@@ -80,34 +80,20 @@ class Game:
                     self.player.current_weapon = (self.player.current_weapon + 1) % len(self.player.weapons)
 
         pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[pygame.K_a]:
-            self.player.state = PlayerStates.RUNNING_LEFT
-            self.player.change_move_vector(x=-MOVEMENT_SPEED)
-        elif pressed_keys[pygame.K_d]:
-            self.player.state = PlayerStates.RUNNING_RIGHT
-            self.player.change_move_vector(x=MOVEMENT_SPEED)
-        elif pressed_keys[pygame.K_w]:
-            if not self.player.jumped:
-                self.player.jumped = True
-                self.player.change_move_vector(y=-2*MOVEMENT_SPEED)
-        else:
-            self.player.state = PlayerStates.STANDING
-        self.player.move()
+        self.player.process_keys_and_move(pressed_keys, self.map.blocks.values())
         for entity in self.entities:
             if HITBOXES_MODE:
-                entity.draw_hitbox(self.screen)
+                entity.draw_hitbox(self.screen, self.player.position)
             for e in self.entities:
-                e.intersects(entity)
-                if isinstance(e, Platform):
-                    e.interact(entity)
+                e.interact(entity)
 
     def draw(self):
         self.screen.fill((0, 0, 0))
         self.map.draw(self.screen, self.player.position)
 
-        all = [*self.players.values(), self.player, *self.bullets]  # *self.buffs]
+        map_objects = [*self.players.values(), self.player, *self.bullets]  # *self.buffs]
 
-        for obj in all:
+        for obj in map_objects:
             if obj is not None:
                 obj.draw(self.screen, self.player.position)
 

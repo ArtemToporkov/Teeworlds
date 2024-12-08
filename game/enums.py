@@ -20,3 +20,10 @@ class PlayerStates(Enum):
     RUNNING_RIGHT = auto()
     RUNNING_LEFT = auto()
     JUMPING = auto()
+
+
+class Collisions(Enum):
+    X_RIGHT = auto()
+    X_LEFT = auto()
+    Y_UP = auto()
+    Y_DOWN = auto()

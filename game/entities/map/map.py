@@ -13,8 +13,12 @@ from pathlib import Path
 
 class Map:
     def __init__(self):
-        self.blocks = {(200, 200): Platform(
-            50, 200, 200, 200, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png')}
+        self.platforms = [
+            Platform(50, 200, 200, 200, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png'),
+            Platform(200, 50, 200, 200, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png'),
+            Platform(50, -150, 200, 200, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png')
+        ]
+        self.blocks = {(i.position.x, i.position.y): i for i in self.platforms}
         self.tile_size = 50
         self.spawn_position = Vector(0, 0)
         self.image = pg.image.load(join(ASSETS_PATH, "maps", "background.png"))
