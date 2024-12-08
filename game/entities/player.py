@@ -6,11 +6,11 @@ from pathlib import Path
 
 from pygame.key import ScancodeWrapper
 
-from game.constants import BACKGROUND_HEIGHT, BACKGROUND_WIDTH, WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, GRAVITY_Y
+from game.constants import BACKGROUND_HEIGHT, BACKGROUND_WIDTH, WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, GRAVITY_Y, JUMP_STRENGTH
 from game.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game.entities.game_object import GameObject
 from game.entities.guns.bullets import Grenade
-from game.entities.guns.weapons import Pistol, ShotGun, Rocket, Egg
+from game.entities.guns.weapons import Pistol, ShotGun, Rocket
 from game.enums import PlayerStates, Collisions
 from geometry.Vector import Vector
 
@@ -88,9 +88,8 @@ class Player(GameObject):
         #     self.hp = 100 + 100
         # if self.hp < 200:
         #     self.hp += 8 / 60
-        offset = Vector(self.width / 2, self.height / 2)
-        self.weapons[self.current_weapon].position = self.position + offset + self.direction * 60
-        self.weapons[self.current_weapon].direction = self.direction
+        self.weapons[self.current_weapon].position = self.position + self.look_direction * 60
+        self.weapons[self.current_weapon].direction = self.look_direction
         if self.position.length() > 10000:
             self.hp -= 1000
 
@@ -103,7 +102,6 @@ class Player(GameObject):
 
     def act(self, other):
         from game.entities.guns.bullets import Bullet, BlowingBullet
-
         if self is other:
             return
         intersecting = self.intersects(other)
@@ -135,15 +133,8 @@ class Player(GameObject):
                 other.alive = False
                 self.hp -= other.damage
 
-        # elif isinstance(other, Buff):
-        #     if intersecting:
-        #         self.add_buff(other)
-
     def move_by_coordinates(self, dx, dy):
         self.position += Vector(dx, dy)
-
-    def jump(self) -> None:
-        pass
 
     def create_frames_list(self, frames_path: Path) -> list[pygame.image]:
         frames = []
@@ -195,9 +186,9 @@ class Player(GameObject):
             self._change_move_vector(y=0)
 
     def _handle_jump(self, platforms):
-        collisions = self.predict_collisions(platforms, self._get_changed_move_vector(y=-2*MOVEMENT_SPEED))
+        collisions = self.predict_collisions(platforms, self._get_changed_move_vector(y=-JUMP_STRENGTH))
         if not collisions[Collisions.Y_UP]:
-            self._change_move_vector(y=-2*MOVEMENT_SPEED)
+            self._change_move_vector(y=-JUMP_STRENGTH)
             self.state = PlayerStates.JUMPING
             self.jumped = True
         else:
@@ -235,8 +226,8 @@ class Player(GameObject):
         else:
             self.current_jumping_frame += 1
 
-    def set_direction(self):
-        self.direction = (
+    def set_look_direction(self) -> None:
+        self.look_direction = (
             Vector(*pg.mouse.get_pos()) - Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
         ).normalize()
 

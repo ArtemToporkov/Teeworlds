@@ -33,28 +33,9 @@ class Bullet(GameObject):
         self.alive = self.alive and not self.blowing
         if isinstance(other, Player) and self.intersects(other):
             self.alive = False
-
-    def collide(self, map):
-        print(self.position)
-        collisions = self.predict_collisions(map.blocks.values(), self.velocity.normalize())
-        if any(collisions.values()):
-            self.blowing = True
-
-    # савин код:
-    # def collide(self, map):
-    #     for corner in self.corners:
-    #         # a = (corner // map.tile_size * map.tile_size
-    #         #     + Vector(map.tile_size / 2, map.tile_size / 2)
-    #         # ).to_tuple
-    #         # print(a)
-    #         # находим координаты центра плитки в которой находится угол
-    #         # и проверяем, лежит ли в данной плитке центр блока карты
-    #         if (
-    #             corner // map.tile_size * map.tile_size
-    #             + Vector(map.tile_size / 2, map.tile_size / 2)
-    #         ).to_tuple in map.blocks.keys():
-    #             self.blowing = True
-    #             print(self.blowing)
+        from game.entities.map.platform import Platform
+        if isinstance(other, Platform) and self.intersects(other):
+            self.alive = False
 
     def draw(self, screen, center):
         if self.image is None:
@@ -150,12 +131,3 @@ class Grenade(Bullet):
                 400,
                 animation_path=join(ASSETS_PATH, "particles", "explosion-1.png"),
             )
-
-    def draw(self, screen, center):
-        if self.image is None:
-            super().draw(screen, center)
-            return
-        pos, top_left, _ = self.convert_coordinates(center)
-        rect = self.image.get_rect(center=pos.tuple)
-        if self.sprite_path is not None:
-            screen.blit(self.image, rect)

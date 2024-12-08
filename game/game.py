@@ -1,6 +1,7 @@
 import pygame
 from pathlib import Path
 from game.constants import FPS, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, MOVEMENT_SPEED, HITBOXES_MODE
+from game.entities.game_object import GameObject
 from game.entities.map.map import Map
 from game.entities.map.platform import Platform
 from game.entities.player import Player
@@ -21,27 +22,27 @@ class Game:
         self.player = Player(100,  100, 48, 48)
         self.entities = [self.player, *self.map.platforms]
 
-    def run(self):
+    def run(self) -> None:
         while self.running:
             self.draw()
             self.process_controls(pygame.event.get())
-            self.act_entities(
-                self.player, *self.players.values(), *self.bullets, #*self.buffs
-            )
+            self.interact_entities(self.player, *self.players.values(), *self.bullets, *self.map.platforms)
             self.update_entities()
             pygame.display.flip()
             self.clock.tick(FPS)
 
-    def act_entities(self, *entities):
+    def interact_entities(self, *entities: GameObject) -> None:
         for first in entities:
             for second in entities:
                 first.act(second)
+        if HITBOXES_MODE:
+            for entity in entities:
+                entity.draw_hitbox(self.screen, self.player)
 
-
-    def update_entities(self):
+    def update_entities(self) -> None:
         for player in self.players.values():
             player.update()
-        self.player.set_direction()
+        self.player.set_look_direction()
         self.player.update()
         if not self.player.alive:
             self.player.position = self.map.spawn_position
@@ -50,13 +51,8 @@ class Game:
             bullet.update()
             if not bullet.alive:
                 self.bullets.remove(bullet)
-        # for buff in self.buffs:
-        #     if not buff.alive:
-        #         self.buffs.remove(buff)
-        # if self.hook is not None:
-        #     self.hook.update()
 
-    def process_controls(self, events: list[pygame.event.Event]):
+    def process_controls(self, events: list[pygame.event.Event]) -> None:
         for event in events:
             if event.type == pygame.QUIT:
                 self.running = False
@@ -74,20 +70,11 @@ class Game:
 
         pressed_keys = pygame.key.get_pressed()
         self.player.process_keys_and_move(pressed_keys, self.map.platforms)
-        for entity in self.entities:
-            if HITBOXES_MODE:
-                entity.draw_hitbox(self.screen, self.player)
-            for e in self.entities:
-                e.interact(entity)
-        if HITBOXES_MODE:
-            self.player.weapons[self.player.current_weapon].draw_hitbox(self.screen, self.player)
 
-    def draw(self):
+    def draw(self) -> None:
         self.screen.fill((0, 0, 0))
         self.map.draw(self.screen, self.player)
-
-        map_objects = [*self.players.values(), self.player, *self.bullets]  # *self.buffs]
-
+        map_objects = [*self.players.values(), self.player, *self.bullets]
         for obj in map_objects:
             if obj is not None:
                 obj.draw(self.screen, self.player)

@@ -15,7 +15,8 @@ from pathlib import Path
 class Map:
     def __init__(self):
         self.platforms = [
-            Platform(50, 200, 200, 200, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png')
+            Platform(50, 200, 415, 178, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '7.png'),
+            Platform(500, 50, 198, 163, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png')
         ]
         self.tile_size = 50
         self.spawn_position = Vector(0, 0)

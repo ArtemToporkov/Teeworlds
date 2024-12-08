@@ -11,6 +11,7 @@ import random
 
 BULLETS_PATH = os.path.join(ASSETS_PATH, "weapons", "bullets")
 
+
 class ImageLoader:
     @staticmethod
     def load_sprite(sprite_path, width):
@@ -35,11 +36,9 @@ class Weapon(GameObject):
         pass
 
     def draw(self, screen, center):
-        if not self.image:
-            return
         angle = -math.atan2(self.direction.y, self.direction.x) / math.pi * 180
         new_coordinates = self.get_coordinates_offset_by_center(center)
-        rect = self.image.get_rect(center=(new_coordinates.x, new_coordinates.y))
+        rect = self.image.get_rect(center=(new_coordinates.x + center.width / 2, new_coordinates.y + center.height / 2))
         image = self.image
         if angle > 90 or angle < -90:
             image = pg.transform.flip(image, False, True)
@@ -106,33 +105,3 @@ class Rocket(Weapon):
         bullets.append(bullet)
 
         return bullets
-
-
-class Egg(Weapon):
-    def get_bullet(self):
-        bullets = []
-        bullet_pos = self.position - self.direction * 60 + Vector(0, 60)
-        bullet = Grenade(
-            bullet_pos.x,
-            bullet_pos.y,
-            50,
-            50,
-            300,
-            sprite_path=os.path.join(BULLETS_PATH, "egg.png"),
-        )
-        bullet.velocity = Vector(3 * (random.randint(0, 1) - 0.5) * 2, 0)
-        bullets.append(bullet)
-        return bullets
-
-    def draw(self, screen, center):
-        pass
-
-
-class Kit(Weapon):
-    def __init__(self, x, y, width, sprite_path, owner):
-        super().__init__(x, y, width, sprite_path)
-        self.hp = 100
-        self.owner = owner
-
-    def get_bullet(self):
-        self.owner.hp += self.hp

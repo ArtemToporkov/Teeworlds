@@ -109,6 +109,7 @@ class GameObject(SerializationMixin):
         self.hitbox_color = (255, 0, 0)
         self.width = width
         self.height = height
+        # TODO: убрать width и height, так как они почти всегда равны размеру изображения
 
         self.sprite_path = sprite_path
         self.image = ImageLoader.load_image(sprite_path, width, height)
@@ -122,7 +123,7 @@ class GameObject(SerializationMixin):
         self.top_left = Vector(self.position.x - self.width, self.position.y + self.height)
         self.corners = [self.top_right, self.bottom_right, self.bottom_left, self.top_left]
 
-        self.direction = Vector(0, 1)
+        self.look_direction = Vector(0, 1)
         self.collision_handler = CollisionHandler(self)
         self.is_landed = False
 
@@ -157,15 +158,6 @@ class GameObject(SerializationMixin):
         if self.velocity.length() > 25:
             self.velocity = self.velocity.normalize() * 25
         self.position += self.velocity
-        self.apply_forces()
-        # self.animate()
-
-    def apply_forces(self):
-        if not self.is_landed:
-            self.velocity = self.velocity + GRAVITY
-
-    def collide(self, map):
-        self.collision_handler.collide(map)
 
     def draw(self, screen, center):
         new_coordinates = self.get_coordinates_offset_by_center(center)
@@ -173,14 +165,11 @@ class GameObject(SerializationMixin):
 
     def draw_hitbox(self, screen, center):
         new_coordinates = self.get_coordinates_offset_by_center(center)
-        pg.draw.circle(screen, self.hitbox_color, (new_coordinates.x, new_coordinates.y), 2)
+        pg.draw.circle(screen, self.hitbox_color, (new_coordinates.x + self.width / 2, new_coordinates.y + self.height / 2), 2)
         pg.draw.rect(screen, self.hitbox_color, (new_coordinates.x, new_coordinates.y, self.width, self.height), 2)
 
-    def interact(self, other: 'GameObject'):
-        if self.intersects(other):
-            self.hitbox_color = (0, 255, 0)
-        else:
-            self.hitbox_color = (255, 0, 0)
+    def act(self, other: 'GameObject'):
+        pass
 
     def get_particle(self):
         return None
