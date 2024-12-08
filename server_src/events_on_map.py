@@ -6,7 +6,7 @@ from artem_lox_zatichki.entities.buff import InvisibilityBuff, SpeedBuff, JumpBu
 from artem_lox_zatichki.entities.bullets import BlowingBullet
 from artem_lox_zatichki.other.constants import ROOT
 from artem_lox_zatichki.other.wrapper import Wrap
-from geometry.Vector import Vector
+from geometry.vector import Vector
 
 
 class SwitchObject:

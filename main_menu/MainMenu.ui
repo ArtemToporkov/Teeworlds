@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1280</width>
+    <height>720</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1280</width>
+    <height>720</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1280</width>
+    <height>720</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>220</y>
+      <width>371</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="startButton">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    border: 3px solid #724624; /* Коричневая рамка */
+    background-color: #FFC89C; /* Коричнево-бежевое наполнение */
+    border-radius: 10px; /* Скруглённые углы */
+    padding: 10px; /* Дополнительное пространство внутри кнопки */
+    color: #000000; /* Цвет текста */
+}
+
+QPushButton:hover {
+    background-color: #FFDBBF; /* Изменение цвета фона при наведении */
+}
+
+QPushButton:pressed {
+    background-color: #FFB881; /* Изменение цвета фона при нажатии */
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Start</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="editorButton">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    border: 3px solid #724624; /* Коричневая рамка */
+    background-color: #FFC89C; /* Коричнево-бежевое наполнение */
+    border-radius: 10px; /* Скруглённые углы */
+    padding: 10px; /* Дополнительное пространство внутри кнопки */
+    color: #000000; /* Цвет текста */
+}
+
+QPushButton:hover {
+    background-color: #FFDBBF; /* Изменение цвета фона при наведении */
+}
+
+QPushButton:pressed {
+    background-color: #FFB881; /* Изменение цвета фона при нажатии */
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Level editor</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="exitButton">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    border: 3px solid #724624; /* Коричневая рамка */
+    background-color: #FFC89C; /* Коричнево-бежевое наполнение */
+    border-radius: 10px; /* Скруглённые углы */
+    padding: 10px; /* Дополнительное пространство внутри кнопки */
+    color: #000000; /* Цвет текста */
+}
+
+QPushButton:hover {
+    background-color: #FFDBBF; /* Изменение цвета фона при наведении */
+}
+
+QPushButton:pressed {
+    background-color: #FFB881; /* Изменение цвета фона при нажатии */
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Exit</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1280</width>
+      <height>720</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>1280</width>
+      <height>720</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>1280</width>
+      <height>720</height>
+     </size>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-image: url(:/background/bg.png);</string>
+    </property>
+   </widget>
+   <zorder>widget</zorder>
+   <zorder>verticalLayoutWidget</zorder>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1280</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources>
+  <include location="src/background.qrc"/>
+ </resources>
+ <connections/>
+</ui>
