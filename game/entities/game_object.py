@@ -1,5 +1,5 @@
 from game.enums import GameObjectData, Collisions
-from geometry.Vector import Vector
+from geometry.vector import Vector
 from game.constants import BACKGROUND_WIDTH, BACKGROUND_HEIGHT
 from game.constants import GRAVITY
 import os

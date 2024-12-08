@@ -2,7 +2,7 @@ import os
 
 from game.entities.guns.bullets import Bullet, Grenade, BlowingBullet
 from game.entities.game_object import GameObject
-from geometry.Vector import Vector
+from geometry.vector import Vector
 from game.constants import ASSETS_PATH
 import pygame as pg
 import math

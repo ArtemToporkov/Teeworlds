@@ -7,7 +7,7 @@ from game.constants import GRAVITY, ASSETS_PATH
 from os.path import join
 
 from game.entities.guns.effects import Effect
-from geometry.Vector import Vector
+from geometry.vector import Vector
 
 
 class Bullet(GameObject):
@@ -55,7 +55,7 @@ class BlowingBullet(Bullet):
 
     def apply_forces(self):
         if not self.is_landed:
-            self.velocity = self.velocity + GRAVITY * 0.4
+            self.velocity = self.velocity + Vector(0, GRAVITY) * 0.4
 
     def update(self):
         super().update()

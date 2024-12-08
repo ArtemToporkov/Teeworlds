@@ -6,13 +6,13 @@ from pathlib import Path
 
 from pygame.key import ScancodeWrapper
 
-from game.constants import BACKGROUND_HEIGHT, BACKGROUND_WIDTH, WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, GRAVITY_Y, JUMP_STRENGTH
+from game.constants import BACKGROUND_HEIGHT, BACKGROUND_WIDTH, WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH
 from game.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game.entities.game_object import GameObject
 from game.entities.guns.bullets import Grenade, Bullet
 from game.entities.guns.weapons import Pistol, ShotGun, Rocket
 from game.enums import PlayerStates, Collisions
-from geometry.Vector import Vector
+from geometry.vector import Vector
 
 
 class Player(GameObject):
@@ -173,10 +173,10 @@ class Player(GameObject):
         current_collisions = self.predict_collisions(platforms, self.move_force_vector)
         if not current_collisions[Collisions.Y_DOWN]:
             collisions = self.predict_collisions(platforms, self._get_changed_move_vector(
-                y=self.move_force_vector.y + GRAVITY_Y
+                y=self.move_force_vector.y + GRAVITY
             ))
             if not collisions[Collisions.Y_DOWN]:
-                self._change_move_vector(y=self.move_force_vector.y + GRAVITY_Y)
+                self._change_move_vector(y=self.move_force_vector.y + GRAVITY)
             else:
                 self._change_move_vector(y=0)
                 self.jumped = False

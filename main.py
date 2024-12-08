@@ -6,4 +6,5 @@ from pygame import display
 if __name__ == '__main__':
     screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     game = Game(screen)
+
     game.run()

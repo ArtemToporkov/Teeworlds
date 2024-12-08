@@ -5,7 +5,7 @@ from game.entities.map.platform import Platform
 import pygame as pg
 
 from game.enums import MapData
-from geometry.Vector import Vector
+from geometry.vector import Vector
 from game.constants import ASSETS_PATH
 from os.path import join
 from typing import Type

@@ -1,4 +1,4 @@
-from geometry.Vector import Vector
+from geometry.vector import Vector
 import pygame as pg
 
 from game.entities.game_object import GameObject
