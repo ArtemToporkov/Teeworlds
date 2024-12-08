@@ -13,6 +13,7 @@ class MainMenu(QMainWindow):
         ui = Path("MainMenu.ui")
         loadUi(ui, self)
         self.startButton.clicked.connect(self._start_game)
+        self.editorButton.clicked.connect(self._editor)
 
     def _start_game(self) -> None:
         self.close()
@@ -24,6 +25,9 @@ class MainMenu(QMainWindow):
         game = Game(screen)
         game.run()
 
+    def _editor(self) -> None:
+        # TODO: сделать editor
+        pass
 
 
 if __name__ == '__main__':
