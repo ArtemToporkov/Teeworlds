@@ -23,8 +23,8 @@ class ImageLoader:
 
 
 class Weapon(GameObject):
-    def __init__(self, x, y, width, sprite_path):
-        super().__init__(x, y, width=width, sprite_path=sprite_path)
+    def __init__(self, x, y, width, height, sprite_path):
+        super().__init__(x, y, width=width, height=height, sprite_path=sprite_path)
         self.image = ImageLoader.load_sprite(sprite_path, width)
         self.kickback = 0
         self.direction = Vector(0, 0)
@@ -38,9 +38,8 @@ class Weapon(GameObject):
         if not self.image:
             return
         angle = -math.atan2(self.direction.y, self.direction.x) / math.pi * 180
-        # new_position = self.get_coordinates_offset_by_center(center)
-        pos, _, _ = self.convert_coordinates(center)
-        rect = self.image.get_rect(center=pos.to_tuple())
+        new_coordinates = self.get_coordinates_offset_by_center(center)
+        rect = self.image.get_rect(center=(new_coordinates.x, new_coordinates.y))
         image = self.image
         if angle > 90 or angle < -90:
             image = pg.transform.flip(image, False, True)
@@ -51,7 +50,7 @@ class Weapon(GameObject):
 
 class Pistol(Weapon):
     def get_bullet(self):
-        bullet_pos = self.position + self.direction * self.dist / 2
+        bullet_pos = self.position
         bullet = Bullet(
             bullet_pos.x,
             bullet_pos.y,
@@ -61,7 +60,7 @@ class Pistol(Weapon):
             sprite_path=os.path.join(BULLETS_PATH, "bullet.png"),
         )
         bullet.velocity = self.direction * 50
-        return [bullet]
+        return bullet
 
 
 class ShotGun(Weapon):
@@ -88,8 +87,8 @@ class ShotGun(Weapon):
 
 
 class Rocket(Weapon):
-    def __init__(self, x, y, width, sprite_path):
-        super().__init__(x, y, width, sprite_path)
+    def __init__(self, x, y, width, height, sprite_path):
+        super().__init__(x, y, width, height, sprite_path)
         self.kickback = 20
 
     def get_bullet(self):

@@ -19,16 +19,16 @@ class Platform(GameObject):
         new_position = self.get_coordinates_offset_by_center(center)
         screen.blit(self.sprite, (new_position.x, new_position.y, self.width, self.height))
 
-    def get_collisions(self, other: GameObject) -> dict[Collisions, bool]:
+    def get_collisions(self, other: GameObject, potential_move: Vector) -> dict[Collisions, bool]:
         object_to_check_clone = GameObject(
             x=other.position.x, y=other.position.y, width=other.width, height=other.height,
         )
-        delta = MOVEMENT_SPEED
+        dx, dy = abs(potential_move.x), abs(potential_move.y)
         return {
-            Collisions.X_RIGHT: self._move_and_check_collisions(object_to_check_clone, delta, 0),
-            Collisions.X_LEFT: self._move_and_check_collisions(object_to_check_clone, -delta, 0),
-            Collisions.Y_UP: self._move_and_check_collisions(object_to_check_clone, 0, -delta),
-            Collisions.Y_DOWN: self._move_and_check_collisions(object_to_check_clone, 0, delta)
+            Collisions.X_RIGHT: self._move_and_check_collisions(object_to_check_clone, dx, 0),
+            Collisions.X_LEFT: self._move_and_check_collisions(object_to_check_clone, -dx, 0),
+            Collisions.Y_UP: self._move_and_check_collisions(object_to_check_clone, 0, -dy),
+            Collisions.Y_DOWN: self._move_and_check_collisions(object_to_check_clone, 0, dy)
         }
 
     def _move_and_check_collisions(self, fake: GameObject, dx, dy) -> bool:

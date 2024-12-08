@@ -19,18 +19,15 @@ class Game:
         self.players = dict()
         self.map = Map()
         self.player = Player(100,  100, 48, 48)
-        self.entities = [self.player, *self.map.blocks.values()]
+        self.entities = [self.player, *self.map.platforms]
 
     def run(self):
         while self.running:
             self.draw()
             self.process_controls(pygame.event.get())
-            # self.check_collisions([self.player])
-            # self.check_collisions(self.players.values())
             self.act_entities(
                 self.player, *self.players.values(), *self.bullets, #*self.buffs
             )
-            self.check_collisions(self.bullets)
             self.update_entities()
             pygame.display.flip()
             self.clock.tick(FPS)
@@ -40,9 +37,6 @@ class Game:
             for second in entities:
                 first.act(second)
 
-    def check_collisions(self, entities):
-        for entity in entities:
-            entity.collide(self.map)
 
     def update_entities(self):
         for player in self.players.values():
@@ -69,34 +63,31 @@ class Game:
                 quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # ЛКМ
-                    bullets = self.player.shoot()
+                    bullet = self.player.shoot()
                     # if MULTIPLAYER:
                     #     for bullet in bullets:
                     #         self.network.send(Wrap(bullet))
-                    for bullet in bullets:
-                        self.bullets.append(bullet)
+                    self.bullets.append(bullet)
 
                 elif event.button == 3:  # ПКМ
                     self.player.current_weapon = (self.player.current_weapon + 1) % len(self.player.weapons)
 
         pressed_keys = pygame.key.get_pressed()
-        self.player.process_keys_and_move(pressed_keys, self.map.blocks.values())
+        self.player.process_keys_and_move(pressed_keys, self.map.platforms)
         for entity in self.entities:
             if HITBOXES_MODE:
-                entity.draw_hitbox(self.screen, self.player.position)
+                entity.draw_hitbox(self.screen, self.player)
             for e in self.entities:
                 e.interact(entity)
+        if HITBOXES_MODE:
+            self.player.weapons[self.player.current_weapon].draw_hitbox(self.screen, self.player)
 
     def draw(self):
         self.screen.fill((0, 0, 0))
-        self.map.draw(self.screen, self.player.position)
+        self.map.draw(self.screen, self.player)
 
         map_objects = [*self.players.values(), self.player, *self.bullets]  # *self.buffs]
 
         for obj in map_objects:
             if obj is not None:
-                obj.draw(self.screen, self.player.position)
-
-        if HITBOXES_MODE:
-            new_position = self.player.get_coordinates_offset_by_center(self.player.position)
-            pygame.draw.circle(self.screen, (0, 255, 0), (new_position.x, new_position.y), 5)
+                obj.draw(self.screen, self.player)

@@ -35,32 +35,10 @@ class Bullet(GameObject):
             self.alive = False
 
     def collide(self, map):
-        # границы пули
-        left = self.position.x
-        right = self.position.x + self.width
-        top = self.position.y
-        bottom = self.position.y + self.height
-
-        # риндексы клеток по границе пули
-        left_tile = int(left // map.tile_size)
-        right_tile = int(right // map.tile_size)
-        top_tile = int(top // map.tile_size)
-        bottom_tile = int(bottom // map.tile_size)
-
-        # проходим по вем клеткам, которые занимает пуля
-        for tile_x in range(left_tile, right_tile + 1):
-            for tile_y in range(top_tile, bottom_tile + 1):
-                # Определяем центр текущей клетки
-                tile_center = Vector(
-                    tile_x * map.tile_size + map.tile_size / 2,
-                    tile_y * map.tile_size + map.tile_size / 2
-                )
-                # print(tile_center.to_tuple())
-                if tile_center.to_tuple() in map.blocks.keys(): # проверяем, есть ли объект в центре клетки
-                    self.blowing = True
-                    return
-
-        self.blowing = False  # Если пересечений не найдено
+        print(self.position)
+        collisions = self.predict_collisions(map.blocks.values(), self.velocity.normalize())
+        if any(collisions.values()):
+            self.blowing = True
 
     # савин код:
     # def collide(self, map):
@@ -84,10 +62,8 @@ class Bullet(GameObject):
             return
         angle = -math.atan2(self.direction.y, self.direction.x) / math.pi * 180
         rotated_image = pg.transform.rotate(self.image, angle)
-        pos, top_left, _ = self.convert_coordinates(center)
-        rect = rotated_image.get_rect(center=pos.to_tuple())
-        if self.sprite_path is not None:
-            screen.blit(rotated_image, rect)
+        new_position = self.get_coordinates_offset_by_center(center)
+        screen.blit(rotated_image, (new_position.x, new_position.y, self.width, self.height))
 
 
 class BlowingBullet(Bullet):

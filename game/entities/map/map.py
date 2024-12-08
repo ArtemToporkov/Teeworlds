@@ -1,5 +1,6 @@
 import pygame
 
+from game.entities.game_object import GameObject
 from game.entities.map.platform import Platform
 import pygame as pg
 
@@ -14,11 +15,8 @@ from pathlib import Path
 class Map:
     def __init__(self):
         self.platforms = [
-            Platform(50, 200, 200, 200, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png'),
-            Platform(200, 50, 200, 200, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png'),
-            Platform(50, -150, 200, 200, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png')
+            Platform(50, 200, 200, 200, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png')
         ]
-        self.blocks = {(i.position.x, i.position.y): i for i in self.platforms}
         self.tile_size = 50
         self.spawn_position = Vector(0, 0)
         self.image = pg.image.load(join(ASSETS_PATH, "maps", "background.png"))
@@ -50,9 +48,9 @@ class Map:
             MapData.TILE_SIZE: self.tile_size,
         }
 
-    def draw(self, screen: pygame.display, center: Vector) -> None:
-        x = (-(center // 2) % (self.image.get_width())).x
-        y = (-(center // 2) % (self.image.get_height())).y
+    def draw(self, screen: pygame.display, center: GameObject) -> None:
+        x = (-(center.position // 2) % (self.image.get_width())).x
+        y = (-(center.position // 2) % (self.image.get_height())).y
         top_left = Vector(x, y)
 
         screen.blit(self.image, (top_left.x, top_left.y))
@@ -62,6 +60,6 @@ class Map:
             self.image,
             (top_left.x - self.image.get_width(), top_left.y - self.image.get_height()),
         )
-        for block in self.blocks.values():
+        for block in self.platforms:
             block.draw(screen, center)
 

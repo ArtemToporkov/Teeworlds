@@ -1,4 +1,4 @@
-from game.enums import GameObjectData
+from game.enums import GameObjectData, Collisions
 from geometry.Vector import Vector
 from game.constants import BACKGROUND_WIDTH, BACKGROUND_HEIGHT
 from game.constants import GRAVITY
@@ -26,15 +26,6 @@ class SerializationMixin:
             height=data.get(GameObjectData.HEIGHT, 0),
             sprite_path=data[GameObjectData.SPRITE_PATH]
         )
-
-
-class ToolsMixin:
-    def convert_coordinates(self, center):
-        position = self.position - center + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
-        top_left = position - self.size / 2
-        bottom_right = position + self.size / 2
-
-        return position, top_left, bottom_right
 
 
 class CollisionHandler:
@@ -110,14 +101,14 @@ class ImageLoader:
         return image
 
 
-class GameObject(SerializationMixin, ToolsMixin):
+class GameObject(SerializationMixin):
     def __init__(self, x, y, width=0, height=0, sprite_path: os.path = None):
         self.position = Vector(x, y)
-        self.width = width
-        self.height = height
         self.size = Vector(width, height)
         self.velocity = Vector(0, 0)
         self.hitbox_color = (255, 0, 0)
+        self.width = width
+        self.height = height
 
         self.sprite_path = sprite_path
         self.image = ImageLoader.load_image(sprite_path, width, height)
@@ -144,11 +135,22 @@ class GameObject(SerializationMixin, ToolsMixin):
         self.hitbox_color = (255, 0, 0) if not result else (0, 255, 0)
         return result
 
+    def predict_collisions(self, platforms: list['Platform'], potential_move: Vector) -> dict[Collisions, bool]:
+        current_collisions = {
+            col: False for col in [Collisions.X_RIGHT, Collisions.X_LEFT, Collisions.Y_UP, Collisions.Y_DOWN]
+        }
+        for platform in platforms:
+            collisions = platform.get_collisions(self, potential_move)
+            for key in collisions.keys():
+                current_collisions[key] = collisions[key] or current_collisions[key]
+        return current_collisions
+
     def move(self, move_vector: Vector) -> None:
         self.position += move_vector
 
-    def get_coordinates_offset_by_center(self, center: Vector) -> Vector:
-        position = self.position - center + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
+    def get_coordinates_offset_by_center(self, center: 'GameObject') -> Vector:
+        position = self.position - center.position + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
+        position -= Vector(center.width / 2, center.height / 2)
         return position
 
     def update(self):
@@ -166,20 +168,12 @@ class GameObject(SerializationMixin, ToolsMixin):
         self.collision_handler.collide(map)
 
     def draw(self, screen, center):
-        if self.image is None:
-            position, top_left, bottom_right = self.convert_coordinates(center)
-            pg.draw.rect(
-                screen, (255, 255, 0), (top_left.x, top_left.y, self.width, self.height)
-            )
-            return
-
-        pos, top_left, _ = self.convert_coordinates(center)
-        rect = top_left.tuple + self.size.to_tuple
-        if self.sprite_path is not None:
-            screen.blit(self.image, rect)
+        new_coordinates = self.get_coordinates_offset_by_center(center)
+        screen.blit(self.image, (new_coordinates.x, new_coordinates.y, self.width, self.height))
 
     def draw_hitbox(self, screen, center):
         new_coordinates = self.get_coordinates_offset_by_center(center)
+        pg.draw.circle(screen, self.hitbox_color, (new_coordinates.x, new_coordinates.y), 2)
         pg.draw.rect(screen, self.hitbox_color, (new_coordinates.x, new_coordinates.y, self.width, self.height), 2)
 
     def interact(self, other: 'GameObject'):
