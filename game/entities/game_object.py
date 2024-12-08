@@ -168,7 +168,7 @@ class GameObject(SerializationMixin):
         pg.draw.circle(screen, self.hitbox_color, (new_coordinates.x + self.width / 2, new_coordinates.y + self.height / 2), 2)
         pg.draw.rect(screen, self.hitbox_color, (new_coordinates.x, new_coordinates.y, self.width, self.height), 2)
 
-    def act(self, other: 'GameObject'):
+    def interact(self, other: 'GameObject'):
         pass
 
     def get_particle(self):

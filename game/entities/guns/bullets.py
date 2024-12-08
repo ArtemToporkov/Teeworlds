@@ -28,7 +28,7 @@ class Bullet(GameObject):
         if self.lifetime > 300:
             self.alive = False
 
-    def act(self, other):
+    def interact(self, other):
         from game.entities.player import Player
         self.alive = self.alive and not self.blowing
         if isinstance(other, Player) and self.intersects(other):
@@ -82,7 +82,7 @@ class Grenade(Bullet):
         if self.lifetime > 299:
             self.blowing = True
 
-    def act(self, other):
+    def interact(self, other):
         pass
 
     def collide(self, map):

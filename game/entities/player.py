@@ -100,7 +100,7 @@ class Player(GameObject):
         #     else:
         #         buff.update()
 
-    def act(self, other):
+    def interact(self, other):
         from game.entities.guns.bullets import Bullet, BlowingBullet
         if self is other:
             return

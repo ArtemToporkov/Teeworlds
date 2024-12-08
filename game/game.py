@@ -34,7 +34,7 @@ class Game:
     def interact_entities(self, *entities: GameObject) -> None:
         for first in entities:
             for second in entities:
-                first.act(second)
+                first.interact(second)
         if HITBOXES_MODE:
             for entity in entities:
                 entity.draw_hitbox(self.screen, self.player)
