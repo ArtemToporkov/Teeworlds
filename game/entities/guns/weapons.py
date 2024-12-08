@@ -32,7 +32,7 @@ class Weapon(GameObject):
         self.dist = 30
         pass
 
-    def get_bullet(self):
+    def get_bullets(self):
         pass
 
     def draw(self, screen, center):
@@ -48,7 +48,7 @@ class Weapon(GameObject):
 
 
 class Pistol(Weapon):
-    def get_bullet(self):
+    def get_bullets(self):
         bullet_pos = self.position
         bullet = Bullet(
             bullet_pos.x,
@@ -59,11 +59,11 @@ class Pistol(Weapon):
             sprite_path=os.path.join(BULLETS_PATH, "bullet.png"),
         )
         bullet.velocity = self.direction * 50
-        return bullet
+        return [bullet]
 
 
 class ShotGun(Weapon):
-    def get_bullet(self):
+    def get_bullets(self):
         bullets = []
         for i in range(5):
             bullet_pos = (
@@ -90,7 +90,7 @@ class Rocket(Weapon):
         super().__init__(x, y, width, height, sprite_path)
         self.kickback = 20
 
-    def get_bullet(self):
+    def get_bullets(self):
         bullets = []
         bullet_pos = self.position + self.direction * self.dist / 2
         bullet = BlowingBullet(

@@ -59,11 +59,11 @@ class Game:
                 quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # ЛКМ
-                    bullet = self.player.shoot()
+                    bullets = self.player.shoot()
                     # if MULTIPLAYER:
                     #     for bullet in bullets:
                     #         self.network.send(Wrap(bullet))
-                    self.bullets.append(bullet)
+                    self.bullets.extend(bullets)
 
                 elif event.button == 3:  # ПКМ
                     self.player.current_weapon = (self.player.current_weapon + 1) % len(self.player.weapons)

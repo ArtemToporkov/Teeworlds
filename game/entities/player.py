@@ -9,7 +9,7 @@ from pygame.key import ScancodeWrapper
 from game.constants import BACKGROUND_HEIGHT, BACKGROUND_WIDTH, WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, GRAVITY_Y, JUMP_STRENGTH
 from game.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game.entities.game_object import GameObject
-from game.entities.guns.bullets import Grenade
+from game.entities.guns.bullets import Grenade, Bullet
 from game.entities.guns.weapons import Pistol, ShotGun, Rocket
 from game.enums import PlayerStates, Collisions
 from geometry.Vector import Vector
@@ -231,6 +231,6 @@ class Player(GameObject):
             Vector(*pg.mouse.get_pos()) - Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
         ).normalize()
 
-    def shoot(self):
-        bullets = self.weapons[self.current_weapon].get_bullet()
+    def shoot(self) -> list[Bullet]:
+        bullets = self.weapons[self.current_weapon].get_bullets()
         return bullets
