@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="platforms">
+    <file>spawn.png</file>
     <file>1.png</file>
     <file>3.png</file>
     <file>4.png</file>

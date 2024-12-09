@@ -26,12 +26,18 @@ class MainMenu(QMainWindow):
         game.run()
 
     def _editor(self) -> None:
-        # TODO: сделать editor
-        pass
+        from levels_editor.editor import Editor
+        self.close()
+        editor = Editor()
+        editor.show()
 
 
-if __name__ == '__main__':
+def main():
     app = QApplication(sys.argv)
     window = MainMenu()
     window.show()
     sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()
