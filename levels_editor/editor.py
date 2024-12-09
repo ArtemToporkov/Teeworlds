@@ -80,8 +80,6 @@ class Editor(QMainWindow):
             self.spawn.setPos(old_x, old_y)
 
 
-
-
 PLATFORMS_NAMES_AND_PIXMAPS = {
     Buttons.FIRST_PLATFORM: str(Path(__file__).parent / 'src' / '1.png'),
     Buttons.SECOND_PLATFORM: str(Path(__file__).parent / 'src' / '3.png'),
@@ -92,6 +90,7 @@ PLATFORMS_NAMES_AND_PIXMAPS = {
     Buttons.SEVENTH_PLATFORM: str(Path(__file__).parent / 'src' / '8.png'),
     Buttons.SPAWN_BUTTON: str(Path(__file__).parent / 'src' / 'spawn.png')
 }
+
 
 def main():
     app = QApplication(sys.argv)
