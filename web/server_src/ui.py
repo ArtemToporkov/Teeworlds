@@ -4,15 +4,17 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBo
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import Qt
 from os.path import join
-import server_src.server
+import web.server_src.server
 import os
 import sys
+
+from game.constants import SERVER_ADDR
 
 
 class ServerUI(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.server = server_src.server.Server("localhost", 8686)
+        self.server = web.server_src.server.Server(*SERVER_ADDR)
 
         self.server_running = False
         self.init_ui()

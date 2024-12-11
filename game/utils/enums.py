@@ -7,12 +7,32 @@ class MapData(Enum):
     TILE_SIZE = auto()
 
 
+class TypeData(Enum):
+    TYPE = auto()
+
 class GameObjectData(Enum):
-    X = auto()
-    Y = auto()
+    ID = auto()
+    POSITION_X = auto()
+    POSITION_Y = auto()
+    VELOCITY = auto()
     WIDTH = auto()
     HEIGHT = auto()
+    DIRECTION = auto()
     SPRITE_PATH = auto()
+
+
+class PlayerData(Enum):
+    STATE = auto()
+    CURRENT_WEAPON = auto()
+    HOOK_END = auto()
+
+
+class BulletData(Enum):
+    DAMAGE = auto()
+
+
+class BlowingBulletData(Enum):
+    RADIUS = auto()
 
 
 class PlayerStates(Enum):

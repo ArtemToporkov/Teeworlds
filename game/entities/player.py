@@ -6,12 +6,12 @@ from pathlib import Path
 
 from pygame.key import ScancodeWrapper
 
-from game.constants import BACKGROUND_HEIGHT, BACKGROUND_WIDTH, WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH
+from game.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH
 from game.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game.entities.game_object import GameObject
 from game.entities.guns.bullets import Grenade, Bullet
 from game.entities.guns.weapons import Pistol, ShotGun, Rocket
-from game.enums import PlayerStates, Collisions
+from game.utils.enums import PlayerStates, Collisions, PlayerData, GameObjectData, TypeData
 from geometry.vector import Vector
 
 
@@ -22,7 +22,6 @@ class Player(GameObject):
         self.sprite = pygame.image.load(player_sprite_path)
         self.sprite = pygame.transform.scale(self.sprite, (width, height))
         self.state = PlayerStates.STANDING
-        self.movement_speed = MOVEMENT_SPEED
         self.move_force_vector = Vector(0, 0)
         self.jumped = False
         self.in_air = False
@@ -119,14 +118,14 @@ class Player(GameObject):
                     other.alive = False
                     self.hp -= other.damage
                 if (
-                    other.blowing
-                    and (self.position - other.position).length() < other.radius
+                        other.blowing
+                        and (self.position - other.position).length() < other.radius
                 ):
                     self.hp -= other.damage
             if isinstance(other, Grenade):
                 if (
-                    other.blowing
-                    and (self.position - other.position).length() < other.radius
+                        other.blowing
+                        and (self.position - other.position).length() < other.radius
                 ):
                     self.hp -= other.damage
             elif intersecting:
@@ -146,6 +145,15 @@ class Player(GameObject):
             frame = pygame.transform.scale(frame, (self.width, self.height))
             frames.append(frame)
         return frames
+
+    def set_look_direction(self) -> None:
+        self.look_direction = (
+                Vector(*pg.mouse.get_pos()) - Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
+        ).normalize()
+
+    def shoot(self) -> list[Bullet]:
+        bullets = self.weapons[self.current_weapon].get_bullets()
+        return bullets
 
     def process_keys_and_move(self, pressed_keys: ScancodeWrapper | list[bool], platforms: list['Platform']) -> None:
         a_pressed, d_pressed, w_pressed = pressed_keys[pygame.K_a], pressed_keys[pygame.K_d], pressed_keys[pygame.K_w]
@@ -226,11 +234,25 @@ class Player(GameObject):
         else:
             self.current_jumping_frame += 1
 
-    def set_look_direction(self) -> None:
-        self.look_direction = (
-            Vector(*pg.mouse.get_pos()) - Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
-        ).normalize()
+    def to_dict(self):
+        data = super().to_dict()
+        data[TypeData.TYPE.value] = f"{self.__class__.__module__}.{self.__class__.__name__}"
+        data.update({
+            PlayerData.STATE.value: self.state,
+            PlayerData.CURRENT_WEAPON.value: self.current_weapon,
+        })
+        return data
 
-    def shoot(self) -> list[Bullet]:
-        bullets = self.weapons[self.current_weapon].get_bullets()
-        return bullets
+    @staticmethod
+    def from_dict(data):
+        player = Player(
+            x=data[GameObjectData.POSITION_X.value],
+            y=data[GameObjectData.POSITION_Y.value],
+            width=data[GameObjectData.WIDTH.value],
+            height=data[GameObjectData.HEIGHT.value],
+        )
+        player.velocity = data[GameObjectData.VELOCITY.value]
+        player.look_direction = data[GameObjectData.DIRECTION.value]
+        player.state = data[PlayerData.STATE.value]
+        player.current_weapon = data[PlayerData.CURRENT_WEAPON.value]
+        return player

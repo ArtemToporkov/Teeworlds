@@ -4,5 +4,5 @@
 
 
 if __name__ == "__main__":
-    from server_src.ui import ServerUI
+    from web.server_src.ui import ServerUI
     ServerUI.run()

@@ -4,7 +4,7 @@ from game.entities.game_object import GameObject
 from game.entities.map.platform import Platform
 import pygame as pg
 
-from game.enums import MapData
+from game.utils.enums import MapData
 from geometry.vector import Vector
 from game.constants import ASSETS_PATH
 from os.path import join

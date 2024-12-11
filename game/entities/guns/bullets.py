@@ -1,10 +1,10 @@
 import math
-import random
 import pygame as pg
 
 from game.entities.game_object import GameObject
 from game.constants import GRAVITY, ASSETS_PATH
 from os.path import join
+from game.utils.enums import BulletData, BlowingBulletData, GameObjectData, TypeData
 
 from game.entities.guns.effects import Effect
 from geometry.vector import Vector
@@ -46,6 +46,26 @@ class Bullet(GameObject):
         new_position = self.get_coordinates_offset_by_center(center)
         screen.blit(rotated_image, (new_position.x, new_position.y, self.width, self.height))
 
+    def to_dict(self):
+        data = super().to_dict()
+        data[TypeData.TYPE.value] = f"{self.__class__.__module__}.{self.__class__.__name__}"
+        data.update({
+            BulletData.DAMAGE: self.damage
+        })
+        return data
+
+    @staticmethod
+    def from_dict(data):
+        return Bullet(
+            x=data[GameObjectData.POSITION_X.value],
+            y=data[GameObjectData.POSITION_Y.value],
+            width=data[GameObjectData.WIDTH.value],
+            height=data[GameObjectData.HEIGHT.value],
+            sprite_path=data[GameObjectData.SPRITE_PATH.value],
+            damage=data[BulletData.DAMAGE.value]
+        )
+
+
 
 class BlowingBullet(Bullet):
     def __init__(self, x, y, width, height, damage, sprite_path=None):
@@ -61,6 +81,25 @@ class BlowingBullet(Bullet):
         super().update()
         self.direction = self.velocity.normalize()
         self.frames += 1
+
+    def to_dict(self):
+        data = super().to_dict()
+        data[TypeData.TYPE.value] = f"{self.__class__.__module__}.{self.__class__.__name__}"
+        data.update({
+            BlowingBulletData.RADIUS: self.radius
+        })
+
+    @staticmethod
+    def from_dict(data):
+        bullet = BlowingBullet(
+            x=data[GameObjectData.POSITION_X.value],
+            y=data[GameObjectData.POSITION_Y.value],
+            width=data[GameObjectData.WIDTH.value],
+            height=data[GameObjectData.HEIGHT.value],
+            sprite_path=data[GameObjectData.SPRITE_PATH.value],
+            damage=data[BulletData.DAMAGE.value]
+        )
+        bullet.radius = data[BlowingBulletData.RADIUS.value]
 
 
 class Grenade(Bullet):

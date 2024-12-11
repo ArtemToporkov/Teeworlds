@@ -3,6 +3,7 @@ import sys
 
 from artem_lox_zatichki.entities.bullets import Bullet
 from artem_lox_zatichki.entities.player import Player
+from game.utils.serialization_tools import get_entity_type
 
 
 class ClientHandler:
@@ -14,7 +15,7 @@ class ClientHandler:
         self.team = server.current_team
 
         # Инициализация данных клиента
-        self.conn.send(pickle.dumps((self.identifier, server.map_lines, self.team)))
+        self.conn.send(pickle.dumps((self.identifier, server.map_lines)))
         if self.team != -1:
             self.server.current_team = (self.server.current_team + 1) % 2
 
@@ -23,23 +24,22 @@ class ClientHandler:
     def handle(self):
         while self.running:
             try:
-                # Получение данных от клиента
+                # Данные от пользователя
                 data = pickle.loads(self.conn.recv(2048))
                 self.process_data(data)
 
-                # Формирование ответа
+                # Данные от сервера пользователю (от других пользователей)
                 reply = self.prepare_reply()
                 self.conn.sendall(pickle.dumps(reply))
             except Exception:
                 break
 
-        # Закрытие соединения
         self.cleanup()
 
     def process_data(self, data):
-        type = getattr(sys.modules[__name__], data.type)
+        type = get_entity_type(data)
         if issubclass(type, Player):
-            data.id = self.identifier
+            data['id'] = self.identifier
             self.server.players[self.identifier] = data
         elif issubclass(type, Bullet):
             for player_key in self.server.entities_to_send.keys():

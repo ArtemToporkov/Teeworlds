@@ -1,19 +1,23 @@
-import pygame
-from pathlib import Path
-from game.constants import FPS, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, MOVEMENT_SPEED, HITBOXES_MODE
-from game.entities.game_object import GameObject
-from game.entities.map.map import Map
-from game.entities.map.platform import Platform
-from game.entities.player import Player
-from game.enums import PlayerStates
+import sys
+import time
 
+import pygame
+from game.constants import FPS, HITBOXES_MODE, SERVER_ADDR
+from game.entities.game_object import GameObject
+from game.entities.guns.bullets import Bullet
+from game.entities.map.map import Map
+from game.entities.player import Player
+from game.utils.serialization_tools import get_entity
+from web.network import Network
+
+
+MULTIPLAYER = True
 
 class Game:
     def __init__(self, screen: pygame.display):
         self.running = True
         self.screen = screen
-        # bg_path = Path(__file__).parent.parent / 'assets' / 'background.png'
-        # self.background = pygame.transform.scale(pygame.image.load(bg_path), (BACKGROUND_WIDTH, BACKGROUND_HEIGHT))
+
         self.clock = pygame.time.Clock()  # для фпс
         self.entities = []
         self.bullets = []
@@ -21,6 +25,16 @@ class Game:
         self.map = Map()
         self.player = Player(100,  100, 48, 48)
         self.entities = [self.player, *self.map.platforms]
+        if MULTIPLAYER:
+            self.init_multiplayer()
+
+    def init_multiplayer(self):
+        self.network = Network(*SERVER_ADDR)
+        try:
+            self.id, self.map = self.network.connect()
+        except TypeError:
+            print("Server not found")
+            sys.exit()
 
     def run(self) -> None:
         while self.running:
@@ -30,6 +44,7 @@ class Game:
             self.update_entities()
             pygame.display.flip()
             self.clock.tick(FPS)
+            #TODO Жоско полистать тикток
 
     def interact_entities(self, *entities: GameObject) -> None:
         for first in entities:
@@ -60,9 +75,9 @@ class Game:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # ЛКМ
                     bullets = self.player.shoot()
-                    # if MULTIPLAYER:
-                    #     for bullet in bullets:
-                    #         self.network.send(Wrap(bullet))
+                    if MULTIPLAYER:
+                        for bullet in bullets:
+                            self.network.send(bullet.to_dict())
                     self.bullets.extend(bullets)
 
                 elif event.button == 3:  # ПКМ
@@ -78,3 +93,47 @@ class Game:
         for obj in map_objects:
             if obj is not None:
                 obj.draw(self.screen, self.player)
+
+    def receive(self):
+        # Тречим игроков, отправляем объект игрока и получаем других игроков на карте
+        cycle = 0
+        while True:
+            # if self.dead:
+            #     return
+            time.sleep(50 / 1000)
+
+            to_send = self.player.to_dict()
+            to_send['id'] = self.id
+            try:
+                data = self.network.send(to_send)
+            except Exception:
+                raise
+
+            ids = []
+            for wrap in data:
+                entity = get_entity(wrap)
+
+                if isinstance(entity, Player):
+                    ids.append(wrap['id'])
+                    # if wrap['id'] not in self.players.keys():
+                    self.players[wrap['id']] = entity
+                    # else:
+                    #     self.players[wrap['id']].update_from_wrap(wrap)
+                elif isinstance(entity, Bullet):
+                    self.bullets.append(entity)
+                # elif isinstance(obj, Buff):
+                #     buff = wrap.get_new()
+                #     if len(self.buffs) < 6:
+                #         self.buffs.append(buff)
+                else:
+                    raise ValueError
+
+            # обновляем список игроков
+            if cycle % 20 == 0:
+                to_pop = []
+                for key in self.players.keys():
+                    if key not in ids:
+                        to_pop.append(key)
+                for key in to_pop:
+                    self.players.pop(key)
+            cycle += 1

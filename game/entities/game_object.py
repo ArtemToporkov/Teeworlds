@@ -1,7 +1,5 @@
-from game.enums import GameObjectData, Collisions
+from game.utils.enums import GameObjectData, Collisions, TypeData
 from geometry.vector import Vector
-from game.constants import BACKGROUND_WIDTH, BACKGROUND_HEIGHT
-from game.constants import GRAVITY
 import os
 from game.constants import WINDOW_HEIGHT, WINDOW_WIDTH
 import pygame as pg
@@ -10,22 +8,30 @@ import pygame as pg
 class SerializationMixin:
     def to_dict(self):
         return {
-            GameObjectData.X: self.position.x,
-            GameObjectData.Y: self.position.y,
-            GameObjectData.WIDTH: self.width,
-            GameObjectData.HEIGHT: self.height,
-            GameObjectData.SPRITE_PATH: self.sprite_path
+            TypeData.TYPE.value: f"{self.__class__.__module__}.{self.__class__.__name__}",
+            GameObjectData.ID.value: self.id,
+            GameObjectData.POSITION_X.value: self.position.x,
+            GameObjectData.POSITION_Y.value: self.position.y,
+            GameObjectData.VELOCITY.value: self.velocity,
+            GameObjectData.WIDTH.value: self.width,
+            GameObjectData.HEIGHT.value: self.height,
+            GameObjectData.DIRECTION.value: self.look_direction,
+            GameObjectData.SPRITE_PATH.value: self.sprite_path,
         }
 
     @staticmethod
     def from_dict(data):
-        return GameObject(
-            x=data[GameObjectData.X],
-            y=data[GameObjectData.Y],
-            width=data.get(GameObjectData.WIDTH, 0),
-            height=data.get(GameObjectData.HEIGHT, 0),
-            sprite_path=data[GameObjectData.SPRITE_PATH]
+        game_obj = GameObject(
+            x=data[GameObjectData.POSITION_X.value],
+            y=data[GameObjectData.POSITION_Y.value],
+            width=data[GameObjectData.WIDTH.value],
+            height=data[GameObjectData.HEIGHT.value],
+            sprite_path=data[GameObjectData.SPRITE_PATH.value],
         )
+        game_obj.velocity = data[GameObjectData.VELOCITY.value]
+        game_obj.look_direction = data[GameObjectData.DIRECTION.value]
+        return game_obj
+
 
 
 class CollisionHandler:

@@ -22,3 +22,4 @@ BACKGROUND_HEIGHT = 720
 ASSETS_PATH = _find_assets_folder()
 GRAVITY = 0.6
 HITBOXES_MODE = True
+SERVER_ADDR = ("localhost", 8686)

@@ -6,8 +6,8 @@ from tkinter import filedialog
 
 from artem_lox_zatichki.map.map import Map
 
-from server_src.client import ClientHandler
-from server_src.events_on_map import BuffSpawner, EventGenerator
+from web.server_src.client import ClientHandler
+from web.server_src.events_on_map import BuffSpawner, EventGenerator
 
 
 class Server:
@@ -21,7 +21,7 @@ class Server:
         self.map = Map()
 
         self.players = dict()
-        self.entities_to_send = dict()  # key - to whom player
+        self.entities_to_send = dict()
         self.socket = None
         self.clock = None
         self.current_team = -1
@@ -44,13 +44,14 @@ class Server:
         print("Waiting for a connection, Server Started")
 
         self.running = True
-        start_new_thread(self.buff_spawner.spawn_buffs, ())
-        start_new_thread(self.event_generator.start_event, ())
+        # start_new_thread(self.buff_spawner.spawn_buffs, ())
+        # start_new_thread(self.event_generator.start_event, ())
         # server_status.config(text="Server is running")
         while self.running:
             try:
-                conn, addr = self.socket.accept()
+                conn, addr = self.socket.accept()  # получаем сокет через который можно общаться с новым клиентом
                 print("Connected to:", addr)
+                # free_id - будущий id игрока
                 client_handler = ClientHandler(conn, self.free_id, self)
                 self.free_id += 1
                 start_new_thread(client_handler.handle, ())
