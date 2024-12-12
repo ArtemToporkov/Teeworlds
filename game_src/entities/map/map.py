@@ -13,23 +13,20 @@ from pathlib import Path
 
 
 class Map:
-    def __init__(self):
-        self.platforms = [
-            Platform(50, 200, 415, 178, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '7.png'),
-            Platform(500, 50, 198, 163, Path(__file__).parent.parent.parent.parent / 'assets' / 'platforms' / '1.png')
-        ]
+    def __init__(self, platforms: list[Platform], spawn_position: Vector):
+
+        self.platforms = platforms
+        self.spawn_position = spawn_position
         self.tile_size = 50
-        self.spawn_position = Vector(0, 0)
         self.image = pg.image.load(join(ASSETS_PATH, "maps", "background.png"))
         self.image.set_alpha(128)
         self.image = pg.transform.scale(self.image, (800, 600))
 
     @classmethod
     def from_dict(cls: Type['Map'], data: dict) -> 'Map':
-        new_map = cls()
-        new_map.spawn_position = Vector(*data[MapData.SPAWN_POSITION.value])
-        new_map.tile_size = data[MapData.TILE_SIZE.value]
-        new_map.platforms = [Platform.from_dict(platform) for platform in data[MapData.PLATFORMS.value]]
+        spawn_position = Vector(*data[MapData.SPAWN_POSITION.value])
+        platforms = [Platform.from_dict(platform) for platform in data[MapData.PLATFORMS.value]]
+        new_map = cls(platforms, spawn_position)
         return new_map
 
     @classmethod

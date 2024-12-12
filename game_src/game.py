@@ -1,6 +1,7 @@
 import sys
 import threading
 import time
+from pathlib import Path
 
 import pygame
 from game_src.constants import FPS, HITBOXES_MODE, SERVER_ADDR
@@ -11,7 +12,8 @@ from game_src.utils.serialization_tools import get_entity
 from web.network import Network
 
 
-MULTIPLAYER = True
+MULTIPLAYER = False
+
 
 class Game:
     def __init__(self, screen: pygame.display):
@@ -22,8 +24,8 @@ class Game:
         self.entities = []
         self.bullets = []
         self.players = dict()
-        self.map = Map()
-        self.player = Player(100,  100, 48, 48)
+        self.map = Map.load_from_file(str(Path(__file__).parent.parent / 'assets' / 'maps' / 'checking.json'))
+        self.player = Player(self.map.spawn_position.x,  self.map.spawn_position.y, 48, 48)
         self.entities = [self.player, *self.map.platforms]
         if MULTIPLAYER:
             self.init_multiplayer()
