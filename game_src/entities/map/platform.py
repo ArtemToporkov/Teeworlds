@@ -1,9 +1,9 @@
 import os
 import pygame
 
-from game.entities.game_object import GameObject
+from game_src.entities.game_object import GameObject
 from geometry.vector import Vector
-from game.utils.enums import Collisions
+from game_src.utils.enums import Collisions, PlayerData, GameObjectData
 
 
 class Platform(GameObject):
@@ -33,6 +33,20 @@ class Platform(GameObject):
         result = self.intersects(fake)
         fake.position.x, fake.position.y = fake.position.x - dx, fake.position.y - dy
         return result
+
+    def to_dict(self):
+        data = super().to_dict()
+        return data
+
+    @staticmethod
+    def from_dict(data):
+        return Platform(
+            x=data[GameObjectData.POSITION_X.value],
+            y=data[GameObjectData.POSITION_Y.value],
+            width=data[GameObjectData.WIDTH.value],
+            height=data[GameObjectData.HEIGHT.value],
+            sprite_path=data[GameObjectData.SPRITE_PATH.value]
+        )
 
 
 

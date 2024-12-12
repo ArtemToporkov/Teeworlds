@@ -1,9 +1,9 @@
 import os
 
-from game.entities.guns.bullets import BulletData, Grenade, BlowingBulletData, Bullet, BlowingBullet
-from game.entities.game_object import GameObject
+from game_src.entities.guns.bullets import BulletData, Grenade, BlowingBulletData, Bullet, BlowingBullet
+from game_src.entities.game_object import GameObject
 from geometry.vector import Vector
-from game.constants import ASSETS_PATH
+from game_src.constants import ASSETS_PATH
 import pygame as pg
 import math
 import random

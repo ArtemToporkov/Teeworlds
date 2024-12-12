@@ -1,7 +1,7 @@
 from geometry.vector import Vector
 import pygame as pg
 
-from game.entities.game_object import GameObject
+from game_src.entities.game_object import GameObject
 
 
 def load_animation(file_name):

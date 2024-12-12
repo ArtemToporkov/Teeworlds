@@ -4,10 +4,9 @@ from _thread import *
 from os.path import join
 from tkinter import filedialog
 
-from artem_lox_zatichki.map.map import Map
+from game_src.entities.map.map import Map
 
 from web.server_src.client import ClientHandler
-from web.server_src.events_on_map import BuffSpawner, EventGenerator
 
 
 class Server:
@@ -17,7 +16,6 @@ class Server:
         self.running = False
         self.free_id = 0
 
-        self.map_lines = None
         self.map = Map()
 
         self.players = dict()
@@ -27,11 +25,9 @@ class Server:
         self.current_team = -1
         self.mode = 0
 
-        self.buff_spawner = BuffSpawner(self.map, self.entities_to_send)
-        self.event_generator = EventGenerator(self.entities_to_send)
-
     def run(self):
-        if self.map_lines is None:
+        if self.map is None:
+            print('Map is not define')
             return
         self.clock = time.time()
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -67,12 +63,3 @@ class Server:
         self.running = False
         if self.socket is not None:
             self.socket.close()
-
-    def select_map(self):
-        file_path = filedialog.askopenfilename(
-            initialdir=join("assets", "maps"), filetypes=(("TXT files", "*.txt"),)
-        )
-        with open(file_path, "r") as f:
-            self.map_lines = f.readlines()
-        self.map.load_from_list(self.map_lines, w_sprites=False)
-

@@ -18,8 +18,8 @@ class MainMenu(QMainWindow):
     def _start_game(self) -> None:
         self.close()
 
-        from game.game import Game
-        from game.constants import WINDOW_WIDTH, WINDOW_HEIGHT
+        from game_src.game import Game
+        from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT
         from pygame import display
         screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         game = Game(screen)

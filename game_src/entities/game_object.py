@@ -1,22 +1,22 @@
-from game.utils.enums import GameObjectData, Collisions, TypeData
+from game_src.utils.enums import GameObjectData, Collisions, TypeData
 from geometry.vector import Vector
 import os
-from game.constants import WINDOW_HEIGHT, WINDOW_WIDTH
+from game_src.constants import WINDOW_HEIGHT, WINDOW_WIDTH
 import pygame as pg
 
 
 class SerializationMixin:
     def to_dict(self):
         return {
-            TypeData.TYPE.value: f"{self.__class__.__module__}.{self.__class__.__name__}",
+            TypeData.TYPE.value: type(self).__name__,
             GameObjectData.ID.value: self.id,
             GameObjectData.POSITION_X.value: self.position.x,
             GameObjectData.POSITION_Y.value: self.position.y,
-            GameObjectData.VELOCITY.value: self.velocity,
+            GameObjectData.VELOCITY.value: self.velocity.to_tuple(),
             GameObjectData.WIDTH.value: self.width,
             GameObjectData.HEIGHT.value: self.height,
-            GameObjectData.DIRECTION.value: self.look_direction,
-            GameObjectData.SPRITE_PATH.value: self.sprite_path,
+            GameObjectData.DIRECTION.value: self.look_direction.to_tuple(),
+            GameObjectData.SPRITE_PATH.value: str(self.sprite_path),
         }
 
     @staticmethod
@@ -28,8 +28,8 @@ class SerializationMixin:
             height=data[GameObjectData.HEIGHT.value],
             sprite_path=data[GameObjectData.SPRITE_PATH.value],
         )
-        game_obj.velocity = data[GameObjectData.VELOCITY.value]
-        game_obj.look_direction = data[GameObjectData.DIRECTION.value]
+        game_obj.velocity = Vector(*data[GameObjectData.VELOCITY.value])
+        game_obj.look_direction = Vector(*data[GameObjectData.DIRECTION.value])
         return game_obj
 
 
@@ -122,6 +122,7 @@ class GameObject(SerializationMixin):
         self.frames = 0
 
         self.alive = True
+        self.id = None
 
         self.top_right = Vector(self.position.x + self.width, self.position.y + self.height)
         self.bottom_right = Vector(self.position.x + self.width, self.position.y - self.height)

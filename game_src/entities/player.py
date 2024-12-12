@@ -6,12 +6,12 @@ from pathlib import Path
 
 from pygame.key import ScancodeWrapper
 
-from game.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH
-from game.constants import MOVEMENT_SPEED, ASSETS_PATH
-from game.entities.game_object import GameObject
-from game.entities.guns.bullets import Grenade, Bullet
-from game.entities.guns.weapons import Pistol, ShotGun, Rocket
-from game.utils.enums import PlayerStates, Collisions, PlayerData, GameObjectData, TypeData
+from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH
+from game_src.constants import MOVEMENT_SPEED, ASSETS_PATH
+from game_src.entities.game_object import GameObject
+from game_src.entities.guns.bullets import Grenade, Bullet
+from game_src.entities.guns.weapons import Pistol, ShotGun, Rocket
+from game_src.utils.enums import PlayerStates, Collisions, PlayerData, GameObjectData, TypeData
 from geometry.vector import Vector
 
 
@@ -100,7 +100,7 @@ class Player(GameObject):
         #         buff.update()
 
     def interact(self, other):
-        from game.entities.guns.bullets import Bullet, BlowingBullet
+        from game_src.entities.guns.bullets import Bullet, BlowingBullet
         if self is other:
             return
         intersecting = self.intersects(other)
@@ -234,9 +234,24 @@ class Player(GameObject):
         else:
             self.current_jumping_frame += 1
 
+    def update_from_wrap(self, player):
+        self.position = player.position
+        self.velocity = player.velocity
+        self.look_direction = player.look_direction
+        self.width = player.width
+        self.height = player.height
+        self.sprite_path = player.sprite_path
+        self.state = player.state
+        self.current_weapon = player.current_weapon
+        # if not player.hook_end:
+        #     self.hook = None
+        # elif not self.hook:
+        #     self.hook = Hook(self, wrap.hook_end)
+
+
     def to_dict(self):
         data = super().to_dict()
-        data[TypeData.TYPE.value] = f"{self.__class__.__module__}.{self.__class__.__name__}"
+        data[TypeData.TYPE.value] = type(self).__name__
         data.update({
             PlayerData.STATE.value: self.state,
             PlayerData.CURRENT_WEAPON.value: self.current_weapon,
@@ -251,8 +266,8 @@ class Player(GameObject):
             width=data[GameObjectData.WIDTH.value],
             height=data[GameObjectData.HEIGHT.value],
         )
-        player.velocity = data[GameObjectData.VELOCITY.value]
-        player.look_direction = data[GameObjectData.DIRECTION.value]
+        player.velocity = Vector(*data[GameObjectData.VELOCITY.value])
+        player.look_direction = Vector(*data[GameObjectData.DIRECTION.value])
         player.state = data[PlayerData.STATE.value]
         player.current_weapon = data[PlayerData.CURRENT_WEAPON.value]
         return player

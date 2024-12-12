@@ -1,12 +1,12 @@
 import pygame
 
-from game.entities.game_object import GameObject
-from game.entities.map.platform import Platform
+from game_src.entities.game_object import GameObject
+from game_src.entities.map.platform import Platform
 import pygame as pg
 
-from game.utils.enums import MapData
+from game_src.utils.enums import MapData
 from geometry.vector import Vector
-from game.constants import ASSETS_PATH
+from game_src.constants import ASSETS_PATH
 from os.path import join
 from typing import Type
 from pathlib import Path
@@ -27,12 +27,9 @@ class Map:
     @classmethod
     def from_dict(cls: Type['Map'], data: dict) -> 'Map':
         new_map = cls()
-        new_map.spawn_position = Vector(*data[MapData.SPAWN_POSITION])
-        new_map.tile_size = data[MapData.TILE_SIZE]
-        new_map.blocks = {
-            tuple(map(float, pos)): Platform.from_dict(block_data)
-            for pos, block_data in data[MapData.BLOCKS].items()
-        }
+        new_map.spawn_position = Vector(*data[MapData.SPAWN_POSITION.value])
+        new_map.tile_size = data[MapData.TILE_SIZE.value]
+        new_map.platforms = [Platform.from_dict(platform) for platform in data[MapData.PLATFORMS.value]]
         return new_map
 
     @classmethod
@@ -44,9 +41,9 @@ class Map:
 
     def to_dict(self) -> dict[MapData, tuple | dict | int]:
         return {
-            MapData.SPAWN_POSITION: self.spawn_position.to_tuple(),
-            MapData.BLOCKS: {pos: block.to_dict() for pos, block in self.blocks.items()},
-            MapData.TILE_SIZE: self.tile_size,
+            MapData.SPAWN_POSITION.value: self.spawn_position.to_tuple(),
+            MapData.PLATFORMS.value: [platform.to_dict() for platform in self.platforms],
+            MapData.TILE_SIZE.value: self.tile_size,
         }
 
     def draw(self, screen: pygame.display, center: GameObject) -> None:

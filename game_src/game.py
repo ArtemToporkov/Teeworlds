@@ -1,13 +1,13 @@
 import sys
+import threading
 import time
 
 import pygame
-from game.constants import FPS, HITBOXES_MODE, SERVER_ADDR
-from game.entities.game_object import GameObject
-from game.entities.guns.bullets import Bullet
-from game.entities.map.map import Map
-from game.entities.player import Player
-from game.utils.serialization_tools import get_entity
+from game_src.constants import FPS, HITBOXES_MODE, SERVER_ADDR
+from game_src.entities.guns.bullets import Bullet
+from game_src.entities.map.map import Map
+from game_src.entities.player import Player
+from game_src.utils.serialization_tools import get_entity
 from web.network import Network
 
 
@@ -31,12 +31,17 @@ class Game:
     def init_multiplayer(self):
         self.network = Network(*SERVER_ADDR)
         try:
-            self.id, self.map = self.network.connect()
+            self.id, map_data = self.network.connect()
+            self.map = Map.from_dict(map_data)
         except TypeError:
             print("Server not found")
             sys.exit()
 
+        self.multiplayer_thread = threading.Thread(target=self.receive)
+
     def run(self) -> None:
+        if MULTIPLAYER: self.multiplayer_thread.start()
+
         while self.running:
             self.draw()
             self.process_controls(pygame.event.get())
@@ -46,7 +51,7 @@ class Game:
             self.clock.tick(FPS)
             #TODO Жоско полистать тикток
 
-    def interact_entities(self, *entities: GameObject) -> None:
+    def interact_entities(self, *entities: 'GameObject') -> None:
         for first in entities:
             for second in entities:
                 first.interact(second)
@@ -95,12 +100,12 @@ class Game:
                 obj.draw(self.screen, self.player)
 
     def receive(self):
-        # Тречим игроков, отправляем объект игрока и получаем других игроков на карте
+        # Тречим игроков, отправляем объект игрока, получаем других игроков и новые пули на карте
         cycle = 0
         while True:
             # if self.dead:
             #     return
-            time.sleep(50 / 1000)
+            # time.sleep(50 / 1000)
 
             to_send = self.player.to_dict()
             to_send['id'] = self.id
@@ -115,16 +120,12 @@ class Game:
 
                 if isinstance(entity, Player):
                     ids.append(wrap['id'])
-                    # if wrap['id'] not in self.players.keys():
-                    self.players[wrap['id']] = entity
-                    # else:
-                    #     self.players[wrap['id']].update_from_wrap(wrap)
+                    if wrap['id'] not in self.players.keys():
+                        self.players[wrap['id']] = entity
+                    else:
+                        self.players[wrap['id']].update_from_wrap(entity)
                 elif isinstance(entity, Bullet):
                     self.bullets.append(entity)
-                # elif isinstance(obj, Buff):
-                #     buff = wrap.get_new()
-                #     if len(self.buffs) < 6:
-                #         self.buffs.append(buff)
                 else:
                     raise ValueError
 

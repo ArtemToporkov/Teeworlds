@@ -1,12 +1,12 @@
 import math
 import pygame as pg
 
-from game.entities.game_object import GameObject
-from game.constants import GRAVITY, ASSETS_PATH
+from game_src.entities.game_object import GameObject
+from game_src.constants import GRAVITY, ASSETS_PATH
 from os.path import join
-from game.utils.enums import BulletData, BlowingBulletData, GameObjectData, TypeData
+from game_src.utils.enums import BulletData, BlowingBulletData, GameObjectData, TypeData
 
-from game.entities.guns.effects import Effect
+from game_src.entities.guns.effects import Effect
 from geometry.vector import Vector
 
 
@@ -16,6 +16,7 @@ class Bullet(GameObject):
         self.damage = damage
         self.lifetime = 0
         self.blowing = False
+        self.direction = self.velocity.normalize()
 
     def apply_forces(self):
         pass
@@ -29,11 +30,11 @@ class Bullet(GameObject):
             self.alive = False
 
     def interact(self, other):
-        from game.entities.player import Player
+        from game_src.entities.player import Player
         self.alive = self.alive and not self.blowing
         if isinstance(other, Player) and self.intersects(other):
             self.alive = False
-        from game.entities.map.platform import Platform
+        from game_src.entities.map.platform import Platform
         if isinstance(other, Platform) and self.intersects(other):
             self.alive = False
 
@@ -48,15 +49,17 @@ class Bullet(GameObject):
 
     def to_dict(self):
         data = super().to_dict()
-        data[TypeData.TYPE.value] = f"{self.__class__.__module__}.{self.__class__.__name__}"
+        data[TypeData.TYPE.value] = type(self).__name__
         data.update({
-            BulletData.DAMAGE: self.damage
+            BulletData.DAMAGE.value: self.damage,
+            BulletData.DIRECTION.value: self.direction.to_tuple(),
         })
+
         return data
 
     @staticmethod
     def from_dict(data):
-        return Bullet(
+        bullet = Bullet(
             x=data[GameObjectData.POSITION_X.value],
             y=data[GameObjectData.POSITION_Y.value],
             width=data[GameObjectData.WIDTH.value],
@@ -64,6 +67,9 @@ class Bullet(GameObject):
             sprite_path=data[GameObjectData.SPRITE_PATH.value],
             damage=data[BulletData.DAMAGE.value]
         )
+        bullet.direction = Vector(*data[BulletData.DIRECTION.value])
+        bullet.velocity = Vector(*data[GameObjectData.VELOCITY.value])
+        return bullet
 
 
 
@@ -84,7 +90,7 @@ class BlowingBullet(Bullet):
 
     def to_dict(self):
         data = super().to_dict()
-        data[TypeData.TYPE.value] = f"{self.__class__.__module__}.{self.__class__.__name__}"
+        data[TypeData.TYPE.value] = type(self).__name__
         data.update({
             BlowingBulletData.RADIUS: self.radius
         })

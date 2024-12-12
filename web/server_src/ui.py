@@ -8,7 +8,8 @@ import web.server_src.server
 import os
 import sys
 
-from game.constants import SERVER_ADDR
+from game_src.constants import SERVER_ADDR, ASSETS_PATH
+from game_src.entities.map.map import Map
 
 
 class ServerUI(QMainWindow):
@@ -102,26 +103,27 @@ class ServerUI(QMainWindow):
 
     def select_map(self):
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Select Map", join("assets", "maps"), "TXT Files (*.txt)"
+            self, "Select Map", join(ASSETS_PATH, "maps"), "JSON_files (*.json)"
         )
         if file_path:
-            with open(file_path, "r") as f:
-                self.server.map_lines = f.readlines()
-            self.server.map.load_from_list(self.server.map_lines, w_sprites=False)
-            self.map_label.setText(f"Map: {os.path.basename(file_path)}")
+            self.server.map = Map.load_from_file(file_path)
 
     def preload_map(self):
-        path = join("assets", "maps")
-        for file in os.listdir(path):
-            if os.path.isfile(join(path, file)):
-                self.map_label.setText(f"Map: {file}")
-                with open(join(path, file), "r") as f:
-                    self.server.map_lines = f.readlines()
-                self.server.map.load_from_list(self.server.map_lines, w_sprites=False)
-                break
+        path = None
+        base_map = "online_map.json"
+        try:
+            path = join(ASSETS_PATH, "maps", base_map)
+        except FileNotFoundError:
+            print(f'Map: {base_map}, not found')
+            for file in os.listdir(path):
+                if os.path.isfile(join(path, file)):
+                    path = file
+
+        self.map_label.setText(f"Map: {os.path.basename(path)}")
+        self.server.map = Map.load_from_file(path)
 
     def update_button_image(self):
-        path_to_icon = 'assets/server_icon'
+        path_to_icon = os.path.join(ASSETS_PATH, 'server_icon')
         if self.server_running:
             pixmap = QPixmap(join(path_to_icon, "server_off")).scaled(
                 self.start_server_btn.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation

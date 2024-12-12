@@ -10,8 +10,8 @@ class Network:
     def connect(self):
         try:
             self.client.connect(self.addr)
-            a = pickle.loads(self.client.recv(2**16))
-            return a
+            data_from_server = pickle.loads(self.client.recv(2**16))
+            return data_from_server
         except Exception as e:
             print(e)
 
