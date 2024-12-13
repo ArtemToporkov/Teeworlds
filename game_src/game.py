@@ -1,8 +1,12 @@
+import asyncio
+import json
 import sys
 import threading
 import time
 
 import pygame
+from line_profiler import profile
+
 from game_src.constants import FPS, HITBOXES_MODE, SERVER_ADDR
 from game_src.entities.guns.bullets import Bullet
 from game_src.entities.map.map import Map
@@ -18,29 +22,32 @@ class Game:
         self.running = True
         self.screen = screen
 
-        self.clock = pygame.time.Clock()  # для фпс
+        self.clock = pygame.time.Clock()  # для FPS
         self.entities = []
         self.bullets = []
         self.players = dict()
         self.map = Map()
-        self.player = Player(100,  100, 48, 48)
+        self.player = Player(100, 100, 48, 48)
         self.entities = [self.player, *self.map.platforms]
-        if MULTIPLAYER:
-            self.init_multiplayer()
 
-    def init_multiplayer(self):
-        self.network = Network(*SERVER_ADDR)
+        self.network = None
+        self.multiplayer_thread = None
+
+    async def init_multiplayer(self):
+        network = Network(*SERVER_ADDR)
         try:
-            self.id, map_data = self.network.connect()
+            initialize_data_from_server = await network.connect()
+            self.id, map_data = initialize_data_from_server['id'], initialize_data_from_server['map']
             self.map = Map.from_dict(map_data)
+            return network  # Возвращаем объект Network
         except TypeError:
             print("Server not found")
             sys.exit()
 
-        self.multiplayer_thread = threading.Thread(target=self.receive)
-
     def run(self) -> None:
-        if MULTIPLAYER: self.multiplayer_thread.start()
+        if MULTIPLAYER:
+            self.multiplayer_thread = threading.Thread(target=self.run_receive_loop, daemon=True)
+            self.multiplayer_thread.start()
 
         while self.running:
             self.draw()
@@ -49,7 +56,18 @@ class Game:
             self.update_entities()
             pygame.display.flip()
             self.clock.tick(FPS)
-            #TODO Жоско полистать тикток
+
+    def run_receive_loop(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            self.network = loop.run_until_complete(self.init_multiplayer())
+            loop.run_until_complete(self.receive())
+        except Exception as e:
+            print(f"Error in run_receive_loop: {e}")
+        finally:
+            loop.close()
+
 
     def interact_entities(self, *entities: 'GameObject') -> None:
         for first in entities:
@@ -80,10 +98,11 @@ class Game:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # ЛКМ
                     bullets = self.player.shoot()
-                    if MULTIPLAYER:
-                        for bullet in bullets:
-                            self.network.send(bullet.to_dict())
-                    self.bullets.extend(bullets)
+                    if bullets:
+                        if MULTIPLAYER:
+                            for bullet in bullets:
+                                asyncio.run(self.network.send(bullet.to_dict()))
+                        self.bullets.extend(bullets)
 
                 elif event.button == 3:  # ПКМ
                     self.player.current_weapon = (self.player.current_weapon + 1) % len(self.player.weapons)
@@ -99,42 +118,44 @@ class Game:
             if obj is not None:
                 obj.draw(self.screen, self.player)
 
-    def receive(self):
-        # Тречим игроков, отправляем объект игрока, получаем других игроков и новые пули на карте
-        cycle = 0
+    @profile
+    async def send_player_state(self):
         while True:
-            # if self.dead:
-            #     return
-            # time.sleep(50 / 1000)
-
             to_send = self.player.to_dict()
             to_send['id'] = self.id
             try:
-                data = self.network.send(to_send)
-            except Exception:
-                raise
+                await self.network.send(to_send)
+            except Exception as e:
+                print(f"Error sending player state: {e}")
 
-            ids = []
-            for wrap in data:
-                entity = get_entity(wrap)
+            await asyncio.sleep(0.05)
 
-                if isinstance(entity, Player):
-                    ids.append(wrap['id'])
-                    if wrap['id'] not in self.players.keys():
-                        self.players[wrap['id']] = entity
-                    else:
-                        self.players[wrap['id']].update_from_wrap(entity)
-                elif isinstance(entity, Bullet):
-                    self.bullets.append(entity)
+    @profile
+    async def process_server_messages(self):
+        while True:
+            try:
+                data = await self.network.receive()
+                if data:
+                    parsed_data = json.loads(data)
+                    self._process_data(parsed_data)
+            except Exception as e:
+                print(f"Error processing server messages: {e}")
+
+    def _process_data(self, data):
+        ids = []
+        for wrap in data:
+            entity = get_entity(wrap)
+            if isinstance(entity, Player):
+                ids.append(wrap['id'])
+                if wrap['id'] not in self.players.keys():
+                    self.players[wrap['id']] = entity
                 else:
-                    raise ValueError
+                    self.players[wrap['id']].update_from_wrap(entity)
+            elif isinstance(entity, Bullet):
+                self.bullets.append(entity)
 
-            # обновляем список игроков
-            if cycle % 20 == 0:
-                to_pop = []
-                for key in self.players.keys():
-                    if key not in ids:
-                        to_pop.append(key)
-                for key in to_pop:
-                    self.players.pop(key)
-            cycle += 1
+    async def receive(self):
+        await asyncio.gather(
+            self.send_player_state(),
+            self.process_server_messages()
+        )

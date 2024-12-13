@@ -1,3 +1,4 @@
+import asyncio
 import socket
 import time
 from _thread import *
@@ -22,42 +23,27 @@ class Server:
         self.entities_to_send = dict()
         self.socket = None
         self.clock = None
-        self.current_team = -1
         self.mode = 0
 
-    def run(self):
+    async def run(self):
         if self.map is None:
-            print('Map is not define')
+            print('Map is not defined')
             return
-        self.clock = time.time()
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        try:
-            self.socket.bind((self.ip, self.port))
-        except socket.error as e:
-            str(e)
-        self.socket.listen(2)
-        print("Waiting for a connection, Server Started")
 
         self.running = True
-        # start_new_thread(self.buff_spawner.spawn_buffs, ())
-        # start_new_thread(self.event_generator.start_event, ())
-        # server_status.config(text="Server is running")
-        while self.running:
-            try:
-                conn, addr = self.socket.accept()  # получаем сокет через который можно общаться с новым клиентом
-                print("Connected to:", addr)
-                # free_id - будущий id игрока
-                client_handler = ClientHandler(conn, self.free_id, self)
-                self.free_id += 1
-                start_new_thread(client_handler.handle, ())
-            except socket.error:
-                pass
-        print("Server stopped")
-        # server_status.config(text="Server is not running")
-        self.free_id = 0
-        self.players = dict()
-        self.entities_to_send = dict()
+        server = await asyncio.start_server(self.handle_client, self.ip, self.port)
+        print(f"Server started on {self.ip}:{self.port}")
+
+        async with server:
+            await server.serve_forever()
+
+    async def handle_client(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+        addr = writer.get_extra_info('peername')
+        print(f"Connected to: {addr}")
+
+        client_handler = ClientHandler(reader, writer, self.free_id, self)
+        self.free_id += 1
+        await client_handler.handle()
 
     def stop(self):
         self.running = False

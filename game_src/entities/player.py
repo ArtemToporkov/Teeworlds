@@ -11,7 +11,7 @@ from game_src.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game_src.entities.game_object import GameObject
 from game_src.entities.guns.bullets import Grenade, Bullet
 from game_src.entities.guns.weapons import Pistol, ShotGun, Rocket
-from game_src.utils.enums import PlayerStates, Collisions, PlayerData, GameObjectData, TypeData
+from game_src.utils.enums import PlayerStates, Collisions, PlayerData, GameObjectData, TypeData, get_state_by_value
 from geometry.vector import Vector
 
 
@@ -152,8 +152,10 @@ class Player(GameObject):
         ).normalize()
 
     def shoot(self) -> list[Bullet]:
-        bullets = self.weapons[self.current_weapon].get_bullets()
-        return bullets
+        if self.cooldown < 0:
+            self.cooldown = 30
+            bullets = self.weapons[self.current_weapon].get_bullets()
+            return bullets
 
     def process_keys_and_move(self, pressed_keys: ScancodeWrapper | list[bool], platforms: list['Platform']) -> None:
         a_pressed, d_pressed, w_pressed = pressed_keys[pygame.K_a], pressed_keys[pygame.K_d], pressed_keys[pygame.K_w]
@@ -248,12 +250,11 @@ class Player(GameObject):
         # elif not self.hook:
         #     self.hook = Hook(self, wrap.hook_end)
 
-
     def to_dict(self):
         data = super().to_dict()
         data[TypeData.TYPE.value] = type(self).__name__
         data.update({
-            PlayerData.STATE.value: self.state,
+            PlayerData.STATE.value: self.state.value,
             PlayerData.CURRENT_WEAPON.value: self.current_weapon,
         })
         return data
@@ -268,6 +269,6 @@ class Player(GameObject):
         )
         player.velocity = Vector(*data[GameObjectData.VELOCITY.value])
         player.look_direction = Vector(*data[GameObjectData.DIRECTION.value])
-        player.state = data[PlayerData.STATE.value]
+        player.state = get_state_by_value(data[PlayerData.STATE.value])
         player.current_weapon = data[PlayerData.CURRENT_WEAPON.value]
         return player

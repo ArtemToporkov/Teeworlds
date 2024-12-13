@@ -1,3 +1,4 @@
+import enum
 from enum import Enum, auto
 
 
@@ -37,6 +38,7 @@ class BlowingBulletData(Enum):
     RADIUS = 'radius'
 
 
+@enum.unique
 class PlayerStates(Enum):
     STANDING = auto()
     RUNNING_RIGHT = auto()
@@ -49,3 +51,10 @@ class Collisions(Enum):
     X_LEFT = auto()
     Y_UP = auto()
     Y_DOWN = auto()
+
+
+def get_state_by_value(value):
+    for state in PlayerStates:
+        if state.value == value:
+            return state
+    raise ValueError(f"No state with value {value} found.")

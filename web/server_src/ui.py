@@ -1,3 +1,4 @@
+import asyncio
 from threading import Thread
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QFileDialog, QWidget, QCheckBox
@@ -88,13 +89,25 @@ class ServerUI(QMainWindow):
     def toggle_server(self):
         if not self.server_running:
             # Запуск сервера в отдельном потоке
-            self.server_thread = Thread(target=self.server.run, daemon=True)
+            # self.server_thread = Thread(target=self.server.run, daemon=True)
+            # self.server_thread.start()
+            self.server_thread = Thread(target=self.start_server_loop, daemon=True)
             self.server_thread.start()
             self.server_running = True
         else:
             self.server.stop()
             self.server_running = False
         self.update_button_image()
+
+    def start_server_loop(self):
+        self.server_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.server_loop)
+        try:
+            self.server_loop.run_until_complete(self.server.run())
+        except asyncio.CancelledError:
+            pass
+        finally:
+            self.server_loop.close()
 
     def change_mode(self):
         self.server.change_mode()
