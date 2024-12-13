@@ -87,10 +87,10 @@ class Player(GameObject):
         #     self.jump_count = 0
         if self.hp <= 0:
             self.alive = False
-            self.hp = 100 + 100
+            self.hp = 100
         self.weapons[self.current_weapon].position = self.position + self.look_direction * 60
         self.weapons[self.current_weapon].direction = self.look_direction
-        if self.position.length() > 10000:
+        if self.position.length() > 2000:
             self.hp -= 1000
 
         # for buff in self.buffs:
