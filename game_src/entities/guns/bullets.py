@@ -17,6 +17,10 @@ class Bullet(GameObject):
         self.lifetime = 0
         self.blowing = False
         self.direction = self.velocity.normalize()
+        self.animation_frames = [
+            pg.image.load(join(ASSETS_PATH, 'weapons', 'bullets', 'explosion_animation', f"explosion_{i}.png"))
+            for i in range(1, 8)
+        ]
 
     def apply_forces(self):
         pass
@@ -75,18 +79,18 @@ class Bullet(GameObject):
 class BlowingBullet(Bullet):
     def __init__(self, x, y, width, height, damage, sprite_path=None):
         super().__init__(x, y, width, height, damage, sprite_path=sprite_path)
-        self.radius = 250
+        self.radius = 150
         self.blowing = False
-        self.animation_frame = 0
+        self.number_animation_frame = 1
 
     def apply_forces(self):
         if not self.is_landed:
             self.velocity = self.velocity + Vector(0, GRAVITY) * 0.4
 
     def update(self):
+        if self.blowing: return
         super().update()
         self.direction = self.velocity.normalize()
-        self.frames += 1
 
     def to_dict(self):
         data = super().to_dict()
@@ -97,21 +101,30 @@ class BlowingBullet(Bullet):
         return data
 
     def draw(self, screen, center):
+        # print(f'blowing: {self.blowing}')
         if self.blowing:
-            self.animation_frame += 1
+            if self.number_animation_frame < len(self.animation_frames):
+                # print(f'frame: {self.number_animation_frame}')
+                frame = self.animation_frames[int(self.number_animation_frame)]
+                position = self.get_coordinates_offset_by_center(center)
+                frame_rect = frame.get_rect(center=(position.x + self.width // 2, position.y + self.height // 2))
+                screen.blit(frame, frame_rect.topleft)
+                self.number_animation_frame += 0.25
+                # pg.draw.circle(screen, (0, 0, 255), position.to_tuple(), self.radius) # рисует область взрыва
+            else:
+                self.alive = False
+                self.blowing = False
 
         else:
             super().draw(screen, center)
 
     def interact(self, other):
         from game_src.entities.player import Player
-        self.alive = self.alive and not self.blowing
+        # self.alive = self.alive and not self.blowing
         if isinstance(other, Player) and self.intersects(other):
-            self.alive = False
             self.blowing = True
         from game_src.entities.map.platform import Platform
         if isinstance(other, Platform) and self.intersects(other):
-            self.alive = False
             self.blowing = True
 
     @staticmethod

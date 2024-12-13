@@ -122,7 +122,7 @@ class Player(GameObject):
             if isinstance(other, BlowingBullet):
                 if intersecting:
                     other.blowing = True
-                    other.alive = False
+                    # other.alive = False
                     self.hp -= other.damage
                 if (
                         other.blowing
@@ -351,8 +351,13 @@ class Player(GameObject):
         data.update({
             PlayerData.STATE.value: self.state.value,
             PlayerData.CURRENT_WEAPON.value: self.current_weapon,
-            PlayerData.HP.value: self.hp
+            PlayerData.HP.value: self.hp,
         })
+
+        # if self.hook_position:
+        #     data[PlayerData.HOOK_POSITION.value] = self.hook_position
+        # if self.hook_position:
+        #     data[PlayerData.HOOK_POSITION]
         return data
 
     @staticmethod
@@ -368,5 +373,6 @@ class Player(GameObject):
         player.state = get_state_by_value(data[PlayerData.STATE.value])
         player.current_weapon = data[PlayerData.CURRENT_WEAPON.value]
         player.hp = data[PlayerData.HP.value]
+        # player.hook_position = data[PlayerData.HOOK_POSITION.value]
 
         return player

@@ -26,8 +26,9 @@ class GameObjectData(Enum):
 class PlayerData(Enum):
     STATE = 'state'
     CURRENT_WEAPON = 'current_weapon'
-    HOOK_END = 'hook_end'
+    HOOK_POSITION = 'hook_position'
     HP = 'hp'
+
 
 
 class BulletData(Enum):
