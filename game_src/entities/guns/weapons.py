@@ -8,7 +8,6 @@ import pygame as pg
 import math
 import random
 
-
 BULLETS_PATH = os.path.join(ASSETS_PATH, "weapons", "bullets")
 
 
@@ -67,9 +66,9 @@ class ShotGun(Weapon):
         bullets = []
         for i in range(5):
             bullet_pos = (
-                self.position
-                + self.direction * self.dist / 2
-                + Vector((random.random() - 0.5) * 10, (random.random() - 0.5) * 10)
+                    self.position
+                    + self.direction * self.dist / 2
+                    + Vector((random.random() - 0.5) * 10, (random.random() - 0.5) * 10)
             )
             bullet = Bullet(
                 bullet_pos.x,
@@ -105,3 +104,12 @@ class Rocket(Weapon):
         bullets.append(bullet)
 
         return bullets
+
+
+class MedKit(Weapon):
+    def __init__(self, x, y, width, height, sprite_path, hp):
+        super().__init__(x, y, width, height, sprite_path)
+        self.hp = 50
+
+    def get_bullets(self):
+        return self.hp

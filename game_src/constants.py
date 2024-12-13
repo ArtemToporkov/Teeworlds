@@ -23,3 +23,4 @@ ASSETS_PATH = _find_assets_folder()
 GRAVITY = 0.6
 HITBOXES_MODE = True
 SERVER_ADDR = ("localhost", 8686)
+MAX_HP = 100

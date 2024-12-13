@@ -6,11 +6,11 @@ from pathlib import Path
 
 from pygame.key import ScancodeWrapper
 
-from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH
+from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, MAX_HP
 from game_src.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game_src.entities.game_object import GameObject
 from game_src.entities.guns.bullets import Grenade, Bullet
-from game_src.entities.guns.weapons import Pistol, ShotGun, Rocket
+from game_src.entities.guns.weapons import Pistol, ShotGun, Rocket, MedKit
 from game_src.utils.enums import PlayerStates, Collisions, PlayerData, GameObjectData, TypeData, get_state_by_value
 from geometry.vector import Vector
 
@@ -30,11 +30,12 @@ class Player(GameObject):
             Pistol(0, 0, 50, 50, os.path.join(ASSETS_PATH, "weapons", "pistol.png")),
             ShotGun(0, 0, 50, 50, os.path.join(ASSETS_PATH, "weapons", "shotgun.png")),
             Rocket(0, 0, 75, 75, os.path.join(ASSETS_PATH, "weapons", "rpg.png")),
+            MedKit(0, 0, 75, 75, os.path.join(ASSETS_PATH, "weapons", "medkit.png"), 50)
         ]
         self.current_weapon = 0
         self.cooldown = 30
 
-        self.hp = 100 + 100
+        self.hp = MAX_HP
         self.alive = True
 
         self.current_running_frame = 0
@@ -50,6 +51,11 @@ class Player(GameObject):
     def draw(self, screen: pygame.display, center: GameObject) -> None:
         new_position = self.get_coordinates_offset_by_center(center)
         self.weapons[self.current_weapon].draw(screen, center)
+
+        hp_bar = (new_position - Vector(0, 15)).to_tuple() + (self.width * self.hp / MAX_HP, 12)
+        color = (255, 0, 0)
+        pg.draw.rect(screen, color, hp_bar)
+
         match self.state:
             case PlayerStates.RUNNING_RIGHT | PlayerStates.RUNNING_LEFT:
                 frame = self.running_frames[self.current_running_frame]
@@ -76,17 +82,12 @@ class Player(GameObject):
         # if self.hook:
         #     self.hook.update()
         # if not self.is_landed:
-        #     self.state = "jump"         МОЖНО ИСПОЛЬЗОВАТЬ ДЛЯ АНИМАЦИИ ВМЕСТО ТОГО ЧТОБЫ ТРЕЧИТЬ В GAME
+        #     self.state = "jump"
         # if self.is_landed:
         #     self.jump_count = 0
-        # if self.hp < -1:
-        #     self.die_count += 1
-        #     if self.die_count > 10:
-        #         self.pashalka()
-        #     self.alive = False
-        #     self.hp = 100 + 100
-        # if self.hp < 200:
-        #     self.hp += 8 / 60
+        if self.hp <= 0:
+            self.alive = False
+            self.hp = 100 + 100
         self.weapons[self.current_weapon].position = self.position + self.look_direction * 60
         self.weapons[self.current_weapon].direction = self.look_direction
         if self.position.length() > 10000:
@@ -154,8 +155,14 @@ class Player(GameObject):
     def shoot(self) -> list[Bullet]:
         if self.cooldown < 0:
             self.cooldown = 30
-            bullets = self.weapons[self.current_weapon].get_bullets()
-            return bullets
+            weapon = self.weapons[self.current_weapon]
+            if isinstance(weapon, MedKit):
+                self.hp = min(self.hp + weapon.get_bullets(), MAX_HP)
+                self.current_weapon = 0
+                self.weapons.remove(weapon)
+                return []
+
+            return weapon.get_bullets()
 
     def process_keys_and_move(self, pressed_keys: ScancodeWrapper | list[bool], platforms: list['Platform']) -> None:
         a_pressed, d_pressed, w_pressed = pressed_keys[pygame.K_a], pressed_keys[pygame.K_d], pressed_keys[pygame.K_w]
