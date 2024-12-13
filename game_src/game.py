@@ -128,7 +128,7 @@ class Game:
             except Exception as e:
                 print(f"Error sending player state: {e}")
 
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(1 / FPS)
 
     @profile
     async def process_server_messages(self):
