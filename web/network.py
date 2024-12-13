@@ -57,4 +57,3 @@ class Network:
             return data.decode('utf-8')
         except Exception as e:
             print(f"Receive error: {e}")
-

@@ -257,6 +257,7 @@ class Player(GameObject):
         data.update({
             PlayerData.STATE.value: self.state.value,
             PlayerData.CURRENT_WEAPON.value: self.current_weapon,
+            PlayerData.HP.value: self.hp
         })
         return data
 
@@ -272,4 +273,6 @@ class Player(GameObject):
         player.look_direction = Vector(*data[GameObjectData.DIRECTION.value])
         player.state = get_state_by_value(data[PlayerData.STATE.value])
         player.current_weapon = data[PlayerData.CURRENT_WEAPON.value]
+        player.hp = data[PlayerData.HP.value]
+
         return player

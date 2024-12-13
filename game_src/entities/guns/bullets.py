@@ -77,6 +77,7 @@ class BlowingBullet(Bullet):
         super().__init__(x, y, width, height, damage, sprite_path=sprite_path)
         self.radius = 250
         self.blowing = False
+        self.animation_frame = 0
 
     def apply_forces(self):
         if not self.is_landed:
@@ -91,8 +92,27 @@ class BlowingBullet(Bullet):
         data = super().to_dict()
         data[TypeData.TYPE.value] = type(self).__name__
         data.update({
-            BlowingBulletData.RADIUS: self.radius
+            BlowingBulletData.RADIUS.value: self.radius
         })
+        return data
+
+    def draw(self, screen, center):
+        if self.blowing:
+            self.animation_frame += 1
+
+        else:
+            super().draw(screen, center)
+
+    def interact(self, other):
+        from game_src.entities.player import Player
+        self.alive = self.alive and not self.blowing
+        if isinstance(other, Player) and self.intersects(other):
+            self.alive = False
+            self.blowing = True
+        from game_src.entities.map.platform import Platform
+        if isinstance(other, Platform) and self.intersects(other):
+            self.alive = False
+            self.blowing = True
 
     @staticmethod
     def from_dict(data):
@@ -105,6 +125,9 @@ class BlowingBullet(Bullet):
             damage=data[BulletData.DAMAGE.value]
         )
         bullet.radius = data[BlowingBulletData.RADIUS.value]
+        bullet.direction = Vector(*data[BulletData.DIRECTION.value])
+        bullet.velocity = Vector(*data[GameObjectData.VELOCITY.value])
+        return bullet
 
 
 class Grenade(Bullet):

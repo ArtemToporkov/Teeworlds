@@ -27,6 +27,7 @@ class PlayerData(Enum):
     STATE = 'state'
     CURRENT_WEAPON = 'current_weapon'
     HOOK_END = 'hook_end'
+    HP = 'hp'
 
 
 class BulletData(Enum):

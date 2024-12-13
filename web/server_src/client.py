@@ -20,7 +20,6 @@ class ClientHandler:
             await self.send_initial_data()
 
             while self.running:
-                # Чтение данных от клиента
                 data = await self.read_from_client()
                 if data:
                     for message in data:

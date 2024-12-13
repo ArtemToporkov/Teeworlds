@@ -3,6 +3,7 @@ import json
 import sys
 import threading
 import time
+from asyncio import Queue
 
 import pygame
 from line_profiler import profile
@@ -30,6 +31,7 @@ class Game:
         self.player = Player(100, 100, 48, 48)
         self.entities = [self.player, *self.map.platforms]
 
+        self.send_queue = Queue()
         self.network = None
         self.multiplayer_thread = None
 
@@ -39,7 +41,7 @@ class Game:
             initialize_data_from_server = await network.connect()
             self.id, map_data = initialize_data_from_server['id'], initialize_data_from_server['map']
             self.map = Map.from_dict(map_data)
-            return network  # Возвращаем объект Network
+            return network
         except TypeError:
             print("Server not found")
             sys.exit()
@@ -63,16 +65,10 @@ class Game:
         while self.running:
             self.draw()
             self.process_controls(pygame.event.get())
-            self.interact_entities(self.player, *self.players.values(), *self.bullets, *self.map.platforms)
+            self.interact_entities(*self.bullets, self.player, *self.players.values(), *self.map.platforms)
             self.update_entities()
             pygame.display.flip()
             self.clock.tick(FPS)
-
-    def interaction_of_entities(self):
-        entities = [self.player, *self.players.values(), *self.bullets]
-        for first in entities:
-            for second in entities:
-                first.interact(second)
 
     def interact_entities(self, *entities: 'GameObject') -> None:
         for first in entities:

@@ -90,7 +90,6 @@ class Rocket(Weapon):
         self.kickback = 20
 
     def get_bullets(self):
-        bullets = []
         bullet_pos = self.position + self.direction * self.dist / 2
         bullet = BlowingBullet(
             bullet_pos.x,
@@ -101,9 +100,7 @@ class Rocket(Weapon):
             sprite_path=os.path.join(BULLETS_PATH, "rocket.png"),
         )
         bullet.velocity = self.direction * 15
-        bullets.append(bullet)
-
-        return bullets
+        return [bullet]
 
 
 class MedKit(Weapon):
