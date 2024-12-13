@@ -3,6 +3,7 @@ import json
 import sys
 import threading
 import time
+from pathlib import Path
 from asyncio import Queue
 
 import pygame
@@ -18,6 +19,7 @@ from web.network import Network
 
 MULTIPLAYER = True
 
+
 class Game:
     def __init__(self, screen: pygame.display):
         self.running = True
@@ -27,9 +29,11 @@ class Game:
         self.entities = []
         self.bullets = []
         self.players = dict()
-        self.map = Map()
-        self.player = Player(100, 100, 48, 48)
+        self.map = Map.load_from_file(str(Path(__file__).parent.parent / 'assets' / 'maps' / 'checking.json'))
+        self.player = Player(self.map.spawn_position.x,  self.map.spawn_position.y, 48, 48)
         self.entities = [self.player, *self.map.platforms]
+        if MULTIPLAYER:
+            self.init_multiplayer()
 
         self.send_queue = Queue()
         self.network = None
@@ -69,6 +73,7 @@ class Game:
             self.update_entities()
             pygame.display.flip()
             self.clock.tick(FPS)
+            #TODO Жоско полистать тикток
 
     def interact_entities(self, *entities: 'GameObject') -> None:
         for first in entities:
@@ -109,7 +114,7 @@ class Game:
                     self.player.current_weapon = (self.player.current_weapon + 1) % len(self.player.weapons)
 
         pressed_keys = pygame.key.get_pressed()
-        self.player.process_keys_and_move(pressed_keys, self.map.platforms)
+        self.player.process_keys_and_move(pressed_keys, pygame.mouse.get_pos(), self.map.platforms)
 
     def draw(self) -> None:
         self.screen.fill((0, 0, 0))

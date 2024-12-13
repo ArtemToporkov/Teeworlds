@@ -1,14 +1,23 @@
+import json
+import os
 import sys
 import time
 from functools import partial
 
 import PyQt5
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWizardPage, QGraphicsScene, QGraphicsView, QGraphicsPixmapItem
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWizardPage, QGraphicsScene, QGraphicsPixmapItem, QInputDialog, \
+    QLineEdit, QMessageBox
 from PyQt5.uic import loadUi
 from pathlib import Path
 from PyQt5.QtGui import QPixmap
+
+from game_src.constants import ASSETS_PATH
+from game_src.entities.map.map import Map
+from game_src.entities.map.platform import Platform
+from geometry.vector import Vector
 from levels_editor.src import src
 from buttons_enum import Buttons
+from styles import MAP_SAVING_DIALOG_STYLE
 
 
 class Editor(QMainWindow):
@@ -20,8 +29,10 @@ class Editor(QMainWindow):
         self.scene = self._set_map_scene()
         self.spawn = self._set_spawn()
         self.exitButton.clicked.connect(lambda _: self.close())  # TODO: сделать так чтобы на exit открывалось меню
+        self.saveButton.clicked.connect(self._save)
         self.map.mousePressEvent = self._on_map_clicked
         self.current_selected_item = None
+        self.platforms: dict[(int, int), Platform] = dict()
 
     def _connect_platforms_and_spawn_buttons(self):
         for button in [
@@ -36,40 +47,47 @@ class Editor(QMainWindow):
 
     def _on_map_clicked(self, event):
         placement_position = self.map.mapToScene(event.pos())
+        print(self.platforms)
         match self.current_selected_item:
             case None:
                 return
             case Buttons.DELETE_BUTTON:
                 for item in [i for i in self.scene.items(placement_position) if i != self.spawn]:
                     self.scene.removeItem(item)
+                    if (item.x(), item.y()) in self.platforms.keys():
+                        del self.platforms[item.x(), item.y()]
             case _ if self.current_selected_item in [button for button in Buttons]:
-                qpixmap = QPixmap(PLATFORMS_NAMES_AND_PIXMAPS[self.current_selected_item])
-                scale_coef = 0.5
-                width, height = qpixmap.width() * scale_coef, qpixmap.height() * scale_coef
+                qpixmap = QPixmap(BUTTONS_NAMES_AND_PATHS[self.current_selected_item])
+                width, height = qpixmap.width(), qpixmap.height()
+                placement_position = Vector(placement_position.x() - width / 2, placement_position.y() - height / 2)
                 if self.current_selected_item == Buttons.SPAWN_BUTTON:
-                    self._change_spawn_coordinates(placement_position.x() - width / 2, placement_position.y() - height / 2)
+                    self._change_spawn_coordinates(placement_position.x, placement_position.y)
                     return
                 item = QGraphicsPixmapItem(qpixmap)
-                item.setScale(0.5)
-                item.setPos(placement_position.x() - width / 2, placement_position.y() - height / 2)
+                item.setPos(placement_position.x, placement_position.y)
                 self.scene.addItem(item)
                 if item.collidingItems():
                     self.scene.removeItem(item)
+                else:
+                    self.platforms[(placement_position.x, placement_position.y)] = Platform(
+                        placement_position.x, placement_position.y,
+                        width, height, BUTTONS_NAMES_AND_PATHS[self.current_selected_item]
+                    )
             case _:
                 return
 
     def _set_map_scene(self) -> QGraphicsScene:
         scene = QGraphicsScene()
-        scene.setSceneRect(0, 0, 900, 650)
+        scene.setSceneRect(0, 0, 1800, 1300)
+        self.map.scale(0.5, 0.5)
         self.map.setScene(scene)
         return scene
 
     def _set_spawn(self) -> QGraphicsPixmapItem:
-        spawn = QGraphicsPixmapItem(QPixmap(PLATFORMS_NAMES_AND_PIXMAPS[Buttons.SPAWN_BUTTON]))
-        position = self.map.mapToScene(430, 300)
-        scale_coef = 0.5
+        qpixmap = QPixmap(BUTTONS_NAMES_AND_PATHS[Buttons.SPAWN_BUTTON])
+        spawn = QGraphicsPixmapItem(qpixmap)
+        position = self.map.mapToScene(500 - int(qpixmap.width() / 2), 350 - int(qpixmap.height() / 2))
         spawn.setPos(position)
-        spawn.setScale(scale_coef)
         self.scene.addItem(spawn)
         return spawn
 
@@ -79,8 +97,24 @@ class Editor(QMainWindow):
         if self.spawn.collidingItems():
             self.spawn.setPos(old_x, old_y)
 
+    def _save(self):
+        dialog = QInputDialog(self)
+        dialog.setStyleSheet(MAP_SAVING_DIALOG_STYLE)
+        dialog.setWindowTitle("Save?")
+        dialog.setLabelText("Enter a new map name:")
+        # блокировка основного окна на время работы диалога + проверка на нажатие OK:
+        if dialog.exec_() == QInputDialog.Accepted:
+            map_name = dialog.textValue()
+            if map_name:
+                map = Map(list(self.platforms.values()), Vector(self.spawn.x(), self.spawn.y()))
+                with open(os.path.join(ASSETS_PATH, 'maps', f'{map_name}.json'), 'w') as file:
+                    js = json.dumps(map.to_dict(), indent=4)
+                    file.write(js)
+            else:
+                QMessageBox.critical(self, 'WARNING!', f'Map didn\'t save: the name can\'t be empty.')
 
-PLATFORMS_NAMES_AND_PIXMAPS = {
+
+BUTTONS_NAMES_AND_PATHS = {
     Buttons.FIRST_PLATFORM: str(Path(__file__).parent / 'src' / '1.png'),
     Buttons.SECOND_PLATFORM: str(Path(__file__).parent / 'src' / '3.png'),
     Buttons.THIRD_PLATFORM: str(Path(__file__).parent / 'src' / '4.png'),

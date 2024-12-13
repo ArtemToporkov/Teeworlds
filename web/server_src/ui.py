@@ -123,7 +123,7 @@ class ServerUI(QMainWindow):
 
     def preload_map(self):
         path = None
-        base_map = "online_map.json"
+        base_map = "checking.json"
         try:
             path = join(ASSETS_PATH, "maps", base_map)
         except FileNotFoundError:
