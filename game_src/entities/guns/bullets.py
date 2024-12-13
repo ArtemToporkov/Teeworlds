@@ -62,12 +62,13 @@ class Bullet(GameObject):
 
     @staticmethod
     def from_dict(data):
+        from game_src.utils.serialization_tools import unpacking_path
         bullet = Bullet(
             x=data[GameObjectData.POSITION_X.value],
             y=data[GameObjectData.POSITION_Y.value],
             width=data[GameObjectData.WIDTH.value],
             height=data[GameObjectData.HEIGHT.value],
-            sprite_path=data[GameObjectData.SPRITE_PATH.value],
+            sprite_path=unpacking_path(data[GameObjectData.SPRITE_PATH.value]),
             damage=data[BulletData.DAMAGE.value]
         )
         bullet.direction = Vector(*data[BulletData.DIRECTION.value])
@@ -129,12 +130,13 @@ class BlowingBullet(Bullet):
 
     @staticmethod
     def from_dict(data):
+        from game_src.utils.serialization_tools import unpacking_path
         bullet = BlowingBullet(
             x=data[GameObjectData.POSITION_X.value],
             y=data[GameObjectData.POSITION_Y.value],
             width=data[GameObjectData.WIDTH.value],
             height=data[GameObjectData.HEIGHT.value],
-            sprite_path=data[GameObjectData.SPRITE_PATH.value],
+            sprite_path=unpacking_path(data[GameObjectData.SPRITE_PATH.value]),
             damage=data[BulletData.DAMAGE.value]
         )
         bullet.radius = data[BlowingBulletData.RADIUS.value]

@@ -1,10 +1,11 @@
 import importlib
+import os
 
+from game_src.constants import ASSETS_PATH
 from game_src.entities.game_object import GameObject
 from game_src.entities.guns.bullets import Bullet, BlowingBullet
 from game_src.entities.player import Player
 from game_src.utils.enums import TypeData
-
 
 CLASS_MAP = {
     "Player": Player,
@@ -33,3 +34,11 @@ def get_entity_type(data):
     if not cls:
         raise ValueError(f"Unknown class name '{class_name}'.")
     return cls
+
+
+def packing_path(path):
+    return str(str(path).split(ASSETS_PATH)[1][1:])
+
+
+def unpacking_path(path):
+    return os.path.join(ASSETS_PATH, path)

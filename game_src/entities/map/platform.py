@@ -2,6 +2,7 @@ import os
 import pygame
 
 from game_src.entities.game_object import GameObject
+from game_src.utils.serialization_tools import unpacking_path
 from geometry.vector import Vector
 from game_src.utils.enums import Collisions, PlayerData, GameObjectData
 
@@ -45,7 +46,7 @@ class Platform(GameObject):
             y=data[GameObjectData.POSITION_Y.value],
             width=data[GameObjectData.WIDTH.value],
             height=data[GameObjectData.HEIGHT.value],
-            sprite_path=data[GameObjectData.SPRITE_PATH.value]
+            sprite_path=unpacking_path(data[GameObjectData.SPRITE_PATH.value])
         )
 
 

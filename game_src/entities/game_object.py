@@ -1,12 +1,13 @@
 from game_src.utils.enums import GameObjectData, Collisions, TypeData
 from geometry.vector import Vector
 import os
-from game_src.constants import WINDOW_HEIGHT, WINDOW_WIDTH
+from game_src.constants import WINDOW_HEIGHT, WINDOW_WIDTH, ASSETS_PATH
 import pygame as pg
 
 
 class SerializationMixin:
     def to_dict(self):
+        from game_src.utils.serialization_tools import packing_path
         return {
             TypeData.TYPE.value: type(self).__name__,
             GameObjectData.ID.value: self.id,
@@ -16,17 +17,18 @@ class SerializationMixin:
             GameObjectData.WIDTH.value: self.width,
             GameObjectData.HEIGHT.value: self.height,
             GameObjectData.DIRECTION.value: self.look_direction.to_tuple(),
-            GameObjectData.SPRITE_PATH.value: str(self.sprite_path),
+            GameObjectData.SPRITE_PATH.value: packing_path(self.sprite_path),
         }
 
     @staticmethod
     def from_dict(data):
+        from game_src.utils.serialization_tools import unpacking_path
         game_obj = GameObject(
             x=data[GameObjectData.POSITION_X.value],
             y=data[GameObjectData.POSITION_Y.value],
             width=data[GameObjectData.WIDTH.value],
             height=data[GameObjectData.HEIGHT.value],
-            sprite_path=data[GameObjectData.SPRITE_PATH.value],
+            sprite_path=unpacking_path(data[GameObjectData.SPRITE_PATH.value]),
         )
         game_obj.velocity = Vector(*data[GameObjectData.VELOCITY.value])
         game_obj.look_direction = Vector(*data[GameObjectData.DIRECTION.value])

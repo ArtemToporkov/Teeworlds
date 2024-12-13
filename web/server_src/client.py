@@ -29,6 +29,7 @@ class ClientHandler:
                 await self.send_to_client(reply)
         except Exception as e:
             print(f"Error handling client {self.identifier}: {e}")
+            raise e
         finally:
             self.cleanup()
 

@@ -16,7 +16,6 @@ from game_src.entities.guns.bullets import Grenade, Bullet
 from game_src.entities.guns.weapons import Pistol, ShotGun, Rocket, MedKit
 from game_src.utils.enums import PlayerStates, Collisions, PlayerData, GameObjectData, TypeData, get_state_by_value
 from game_src.entities.guns.weapons import Pistol, ShotGun, Rocket
-from game_src.entities.map.platform import Platform
 from game_src.utils.enums import PlayerStates, Collisions, PlayerData, GameObjectData, TypeData
 from geometry.vector import Vector
 
@@ -243,7 +242,7 @@ class Player(GameObject):
                 )
         self.move(self.move_force_vector)
 
-    def _handle_hook(self, platforms: list[Platform], mouse_pos: tuple[int, int]):
+    def _handle_hook(self, platforms: list["Platform"], mouse_pos: tuple[int, int]):
         self.hook_position = Vector(mouse_pos[0], mouse_pos[1]) - Vector(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
         self.hook_position = self.hook_position.normalize() * MAX_HOOK_LENGTH
         self.hook_vector = Vector(self.hook_position.x, self.hook_position.y)

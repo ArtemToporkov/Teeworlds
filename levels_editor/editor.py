@@ -115,14 +115,14 @@ class Editor(QMainWindow):
 
 
 BUTTONS_NAMES_AND_PATHS = {
-    Buttons.FIRST_PLATFORM: str(Path(__file__).parent / 'src' / '1.png'),
-    Buttons.SECOND_PLATFORM: str(Path(__file__).parent / 'src' / '3.png'),
-    Buttons.THIRD_PLATFORM: str(Path(__file__).parent / 'src' / '4.png'),
-    Buttons.FOURTH_PLATFORM: str(Path(__file__).parent / 'src' / '5.png'),
-    Buttons.FIFTH_PLATFORM: str(Path(__file__).parent / 'src' / '6.png'),
-    Buttons.SIXTH_PLATFORM: str(Path(__file__).parent / 'src' / '7.png'),
-    Buttons.SEVENTH_PLATFORM: str(Path(__file__).parent / 'src' / '8.png'),
-    Buttons.SPAWN_BUTTON: str(Path(__file__).parent / 'src' / 'spawn.png')
+    Buttons.FIRST_PLATFORM: str(Path(ASSETS_PATH) / 'editor' / '1.png'),
+    Buttons.SECOND_PLATFORM: str(Path(ASSETS_PATH) / 'editor' / '3.png'),
+    Buttons.THIRD_PLATFORM: str(Path(ASSETS_PATH) / 'editor' / '4.png'),
+    Buttons.FOURTH_PLATFORM: str(Path(ASSETS_PATH) / 'editor' / '5.png'),
+    Buttons.FIFTH_PLATFORM: str(Path(ASSETS_PATH) / 'editor' / '6.png'),
+    Buttons.SIXTH_PLATFORM: str(Path(ASSETS_PATH) / 'editor' / '7.png'),
+    Buttons.SEVENTH_PLATFORM: str(Path(ASSETS_PATH) / 'editor' / '8.png'),
+    Buttons.SPAWN_BUTTON: str(Path(ASSETS_PATH) / 'editor' / 'spawn.png')
 }
 
 

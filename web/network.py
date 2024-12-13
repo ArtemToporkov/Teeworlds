@@ -1,30 +1,3 @@
-# import json
-# import pickle
-# import socket
-#
-#
-# class Network:
-#     def __init__(self, ip, port):
-#         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#         self.client.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-#         self.addr = (ip, port)
-#
-#     def connect(self):
-#         try:
-#             self.client.connect(self.addr)
-#             data_from_server = json.loads(self.client.recv(2**16).decode('utf-8'))
-#             return data_from_server
-#         except Exception as e:
-#             print(e)
-#
-#     def send(self, data):
-#         try:
-#             self.client.send(json.dumps(data).encode('utf-8'))
-#             response = json.loads(self.client.recv(2048).decode('utf-8'))
-#             return response
-#         except socket.error as e:
-#             print(e)
-
 import asyncio
 import json
 import socket
@@ -50,6 +23,7 @@ class Network:
             await self.writer.drain()
         except Exception as e:
             print(f"Send error: {e}")
+            raise e
 
     async def receive(self):
         try:

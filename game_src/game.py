@@ -1,5 +1,6 @@
 import asyncio
 import json
+import os
 import sys
 import threading
 import time
@@ -9,7 +10,7 @@ from asyncio import Queue
 import pygame
 from line_profiler import profile
 
-from game_src.constants import FPS, HITBOXES_MODE, SERVER_ADDR
+from game_src.constants import FPS, HITBOXES_MODE, SERVER_ADDR, ASSETS_PATH
 from game_src.entities.guns.bullets import Bullet
 from game_src.entities.map.map import Map
 from game_src.entities.player import Player
@@ -29,13 +30,10 @@ class Game:
         self.entities = []
         self.bullets = []
         self.players = dict()
-        self.map = Map.load_from_file(str(Path(__file__).parent.parent / 'assets' / 'maps' / 'checking.json'))
+        self.map = Map.load_from_file(os.path.join(ASSETS_PATH, 'maps', 'checking.json'))
         self.player = Player(self.map.spawn_position.x,  self.map.spawn_position.y, 48, 48)
         self.entities = [self.player, *self.map.platforms]
-        if MULTIPLAYER:
-            self.init_multiplayer()
 
-        self.send_queue = Queue()
         self.network = None
         self.multiplayer_thread = None
 
