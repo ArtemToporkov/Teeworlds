@@ -91,7 +91,7 @@ class Game:
                     self.player.current_weapon = (self.player.current_weapon + 1) % len(self.player.weapons)
 
         pressed_keys = pygame.key.get_pressed()
-        self.player.process_keys_and_move(pressed_keys, self.map.platforms)
+        self.player.process_keys_and_move(pressed_keys, pygame.mouse.get_pos(), self.map.platforms)
 
     def draw(self) -> None:
         self.screen.fill((0, 0, 0))

@@ -7,8 +7,8 @@
         {
             "type_entity": "Platform",
             "id": null,
-            "pos_x": 583.0,
-            "pos_y": 783.0,
+            "pos_x": 543.0,
+            "pos_y": 763.0,
             "velocity": [
                 0,
                 0
@@ -24,70 +24,87 @@
         {
             "type_entity": "Platform",
             "id": null,
-            "pos_x": 489.0,
-            "pos_y": 894.0,
+            "pos_x": 1112.5,
+            "pos_y": 508.5,
             "velocity": [
                 0,
                 0
             ],
-            "width": 226,
-            "height": 176,
+            "width": 195,
+            "height": 135,
             "direction": [
                 0,
                 1
             ],
-            "sprite_path": "D:\\\u043d\u0435\u0432\u0435\u0440\u043e\u044f\u0442\u043d\u044b\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u044b\\python\\Teeworlds\\levels_editor\\src\\8.png"
+            "sprite_path": "D:\\\u043d\u0435\u0432\u0435\u0440\u043e\u044f\u0442\u043d\u044b\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u044b\\python\\Teeworlds\\levels_editor\\src\\6.png"
         },
         {
             "type_entity": "Platform",
             "id": null,
-            "pos_x": 733.0,
-            "pos_y": 894.0,
+            "pos_x": 456.5,
+            "pos_y": 490.5,
             "velocity": [
                 0,
                 0
             ],
-            "width": 226,
-            "height": 176,
+            "width": 195,
+            "height": 135,
             "direction": [
                 0,
                 1
             ],
-            "sprite_path": "D:\\\u043d\u0435\u0432\u0435\u0440\u043e\u044f\u0442\u043d\u044b\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u044b\\python\\Teeworlds\\levels_editor\\src\\8.png"
+            "sprite_path": "D:\\\u043d\u0435\u0432\u0435\u0440\u043e\u044f\u0442\u043d\u044b\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u044b\\python\\Teeworlds\\levels_editor\\src\\6.png"
         },
         {
             "type_entity": "Platform",
             "id": null,
-            "pos_x": 475.0,
-            "pos_y": 604.0,
-            "velocity": [
-                0,
-                0
-            ],
-            "width": 226,
-            "height": 176,
-            "direction": [
-                0,
-                1
-            ],
-            "sprite_path": "D:\\\u043d\u0435\u0432\u0435\u0440\u043e\u044f\u0442\u043d\u044b\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u044b\\python\\Teeworlds\\levels_editor\\src\\8.png"
-        },
-        {
-            "type_entity": "Platform",
-            "id": null,
-            "pos_x": 291.0,
+            "pos_x": 1376.5,
             "pos_y": 676.5,
             "velocity": [
                 0,
                 0
             ],
-            "width": 198,
-            "height": 163,
+            "width": 195,
+            "height": 135,
             "direction": [
                 0,
                 1
             ],
-            "sprite_path": "D:\\\u043d\u0435\u0432\u0435\u0440\u043e\u044f\u0442\u043d\u044b\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u044b\\python\\Teeworlds\\levels_editor\\src\\1.png"
+            "sprite_path": "D:\\\u043d\u0435\u0432\u0435\u0440\u043e\u044f\u0442\u043d\u044b\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u044b\\python\\Teeworlds\\levels_editor\\src\\6.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 154.5,
+            "pos_y": 672.5,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 195,
+            "height": 135,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "D:\\\u043d\u0435\u0432\u0435\u0440\u043e\u044f\u0442\u043d\u044b\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u044b\\python\\Teeworlds\\levels_editor\\src\\6.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 565.0,
+            "pos_y": 393.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 670,
+            "height": 106,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "D:\\\u043d\u0435\u0432\u0435\u0440\u043e\u044f\u0442\u043d\u044b\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u044b\\python\\Teeworlds\\levels_editor\\src\\3.png"
         }
     ],
     "tile_size": 50

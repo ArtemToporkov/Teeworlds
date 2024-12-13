@@ -33,69 +33,6 @@ class SerializationMixin:
         return game_obj
 
 
-
-class CollisionHandler:
-    def __init__(self, game_object):
-        self.game_object = game_object
-
-    def collide(self, map):
-        self.collide_x(map)
-        self.collide_y(map)
-        self.check_landed(map)
-
-    def collide_x(self, map):
-        self.game_object.move(Vector(self.game_object.velocity.x, 0))
-        for corner in self.game_object.corners:
-            key = self.get_block_key(corner, map.tile_size)
-            block = map.blocks.get(key)
-            if block is not None:
-                self.game_object.move(-self.game_object.velocity.x, 0)
-                self.correct_position_x(block)
-                self.game_object.velocity.x = 0
-                break
-        else:
-            self.game_object.move(-Vector(self.game_object.velocity.x, 0))
-
-    def collide_y(self, map):
-        self.game_object.move(Vector(0, self.game_object.velocity.y))
-        for corner in self.game_object.corners:
-            key = self.get_block_key(corner, map.tile_size)
-            block = map.blocks.get(key)
-            if block is not None:
-                self.game_object.move(0, -self.game_object.velocity.y)
-                self.correct_position_y(block)
-                self.game_object.velocity.y = 0
-                break
-        else:
-            self.game_object.move(Vector(0, -self.game_object.velocity.y))
-
-    def check_landed(self, map):
-        self.game_object.move(Vector(0, 2))
-        self.game_object.is_landed = any(
-            map.blocks.get(self.get_block_key(corner, map.tile_size)) is not None
-            for corner in self.game_object.corners
-        )
-        self.game_object.move(Vector(0, -2))
-
-    def correct_position_x(self, block):
-        if self.game_object.velocity.x > 0:
-            self.game_object.position.x = block.top_left.x - self.game_object.width / 2 - 1
-        else:
-            self.game_object.position.x = block.bottom_right.x + self.game_object.width / 2 + 1
-
-    def correct_position_y(self, block):
-        if self.game_object.velocity.y > 0:
-            self.game_object.position.y = block.top_left.y - self.game_object.height / 2 - 1
-        else:
-            self.game_object.position.y = block.bottom_right.y + self.game_object.height / 2 + 1
-
-    def get_block_key(self, corner, tile_size):
-        return (
-                corner // tile_size * tile_size
-                + Vector(tile_size / 2, tile_size / 2)
-        ).to_tuple
-
-
 class ImageLoader:
     @staticmethod
     def load_image(sprite_path, object_width, object_height):
@@ -124,14 +61,13 @@ class GameObject(SerializationMixin):
         self.alive = True
         self.id = None
 
-        self.top_right = Vector(self.position.x + self.width, self.position.y + self.height)
-        self.bottom_right = Vector(self.position.x + self.width, self.position.y - self.height)
-        self.bottom_left = Vector(self.position.x - self.width, self.position.y - self.height)
-        self.top_left = Vector(self.position.x - self.width, self.position.y + self.height)
-        self.corners = [self.top_right, self.bottom_right, self.bottom_left, self.top_left]
+        self.top_left = self.position
+        self.top_right = self.position + Vector(self.width, 0)
+        self.bottom_left = self.position + Vector(0, self.height)
+        self.bottom_right = self.position + Vector(self.width, self.height)
+        self.corners = [self.top_right, self.top_right, self.bottom_left, self.bottom_left]
 
         self.look_direction = Vector(0, 1)
-        self.collision_handler = CollisionHandler(self)
         self.is_landed = False
 
     def intersects(self, other: 'GameObject') -> bool:
@@ -155,10 +91,19 @@ class GameObject(SerializationMixin):
 
     def move(self, move_vector: Vector) -> None:
         self.position += move_vector
+        self.top_right += move_vector
+        self.top_left += move_vector
+        self.bottom_left += move_vector
+        self.bottom_right += move_vector
 
     def get_coordinates_offset_by_center(self, center: 'GameObject') -> Vector:
         position = self.position - center.position + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
         position -= Vector(center.width / 2, center.height / 2)
+        return position
+
+    def get_coordinates_offset_by_self(self, vector: Vector) -> Vector:
+        position = vector - self.position + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2
+        position -= Vector(self.width / 2, self.height / 2)
         return position
 
     def update(self):

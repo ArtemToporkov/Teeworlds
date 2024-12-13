@@ -1,9 +1,11 @@
+import os.path
 import socket
 import time
 from _thread import *
 from os.path import join
 from tkinter import filedialog
 
+from game_src.constants import ASSETS_PATH
 from game_src.entities.map.map import Map
 
 from web.server_src.client import ClientHandler
@@ -16,7 +18,7 @@ class Server:
         self.running = False
         self.free_id = 0
 
-        self.map = Map()
+        self.map = Map.load_from_file(os.path.join(ASSETS_PATH, "maps", "checking.json"))
 
         self.players = dict()
         self.entities_to_send = dict()

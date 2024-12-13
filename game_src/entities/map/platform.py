@@ -22,16 +22,16 @@ class Platform(GameObject):
         )
         dx, dy = abs(potential_move.x), abs(potential_move.y)
         return {
-            Collisions.X_RIGHT: self._move_and_check_collisions(object_to_check_clone, dx, 0),
-            Collisions.X_LEFT: self._move_and_check_collisions(object_to_check_clone, -dx, 0),
-            Collisions.Y_UP: self._move_and_check_collisions(object_to_check_clone, 0, -dy),
-            Collisions.Y_DOWN: self._move_and_check_collisions(object_to_check_clone, 0, dy)
+            Collisions.X_RIGHT: self.top_left.x if self.move_and_check_collisions(object_to_check_clone, dx, 0) else None,
+            Collisions.X_LEFT: self.top_right.x if self.move_and_check_collisions(object_to_check_clone, -dx, 0) else None,
+            Collisions.Y_UP: self.bottom_left.y if self.move_and_check_collisions(object_to_check_clone, 0, -dy) else None,
+            Collisions.Y_DOWN: self.top_right.y if self.move_and_check_collisions(object_to_check_clone, 0, dy) else None
         }
 
-    def _move_and_check_collisions(self, fake: GameObject, dx, dy) -> bool:
-        fake.position.x, fake.position.y = fake.position.x + dx, fake.position.y + dy
+    def move_and_check_collisions(self, fake: GameObject, dx, dy) -> bool:
+        fake.position = Vector(fake.position.x + dx, fake.position.y + dy)
         result = self.intersects(fake)
-        fake.position.x, fake.position.y = fake.position.x - dx, fake.position.y - dy
+        fake.position = Vector(fake.position.x - dx, fake.position.y - dy)
         return result
 
     def to_dict(self):
