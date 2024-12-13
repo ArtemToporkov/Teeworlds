@@ -54,7 +54,7 @@ class Pistol(Weapon):
             bullet_pos.y,
             30,
             30,
-            100,
+            20,
             sprite_path=os.path.join(BULLETS_PATH, "bullet.png"),
         )
         bullet.velocity = self.direction * 50
@@ -75,7 +75,7 @@ class ShotGun(Weapon):
                 bullet_pos.y,
                 20,
                 20,
-                60,
+                20,
                 sprite_path=os.path.join(BULLETS_PATH, "bullet.png"),
             )
             bullet.velocity = self.direction.rotate(random.random() - 0.5) * 50

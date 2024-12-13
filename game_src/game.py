@@ -15,7 +15,7 @@ from game_src.utils.serialization_tools import get_entity
 from web.network import Network
 
 
-MULTIPLAYER = False
+MULTIPLAYER = True
 
 class Game:
     def __init__(self, screen: pygame.display):
@@ -44,20 +44,7 @@ class Game:
             print("Server not found")
             sys.exit()
 
-    def run(self) -> None:
-        if MULTIPLAYER:
-            self.multiplayer_thread = threading.Thread(target=self.run_receive_loop, daemon=True)
-            self.multiplayer_thread.start()
-
-        while self.running:
-            self.draw()
-            self.process_controls(pygame.event.get())
-            self.interact_entities(self.player, *self.players.values(), *self.bullets, *self.map.platforms)
-            self.update_entities()
-            pygame.display.flip()
-            self.clock.tick(FPS)
-
-    def run_receive_loop(self):
+    def _run_receive_loop(self):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
@@ -68,6 +55,24 @@ class Game:
         finally:
             loop.close()
 
+    def run(self) -> None:
+        if MULTIPLAYER:
+            self.multiplayer_thread = threading.Thread(target=self._run_receive_loop, daemon=True)
+            self.multiplayer_thread.start()
+
+        while self.running:
+            self.draw()
+            self.process_controls(pygame.event.get())
+            self.interact_entities(self.player, *self.players.values(), *self.bullets, *self.map.platforms)
+            self.update_entities()
+            pygame.display.flip()
+            self.clock.tick(FPS)
+
+    def interaction_of_entities(self):
+        entities = [self.player, *self.players.values(), *self.bullets]
+        for first in entities:
+            for second in entities:
+                first.interact(second)
 
     def interact_entities(self, *entities: 'GameObject') -> None:
         for first in entities:

@@ -23,7 +23,6 @@ class Bullet(GameObject):
 
     def update(self):
         super().update()
-        # print('x:', self.position.x,'y:',self.position.y)
         self.direction = self.velocity.normalize()
         self.lifetime += 1
         if self.lifetime > 300:

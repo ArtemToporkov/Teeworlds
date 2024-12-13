@@ -123,12 +123,6 @@ class Player(GameObject):
                         and (self.position - other.position).length() < other.radius
                 ):
                     self.hp -= other.damage
-            if isinstance(other, Grenade):
-                if (
-                        other.blowing
-                        and (self.position - other.position).length() < other.radius
-                ):
-                    self.hp -= other.damage
             elif intersecting:
                 other.alive = False
                 self.hp -= other.damage
