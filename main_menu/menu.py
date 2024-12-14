@@ -1,20 +1,16 @@
 import ctypes
+import multiprocessing
 import os
 import sys
-import time
+from enum import Enum, auto
 from os import environ
+from pathlib import Path
 
 import PyQt5
 import pygame
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.uic import loadUi
-from pathlib import Path
-import multiprocessing
-from enum import Enum, auto
-
-from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT
-from game_src import game
 from src import background
 
 

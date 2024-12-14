@@ -1,23 +1,22 @@
-import math
 import os
-import pygame as pg
-
-import pygame
+import os
 from pathlib import Path
 
+import pygame
+import pygame as pg
 from pygame.key import ScancodeWrapper
 
-from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, MAX_HP, \
-    MAX_DISTANCE_TO_CENTRE_FOR_PLAYER, MAP_WIDTH, MAP_HEIGHT
+from game_src.constants import MAX_HP, \
+    MAP_WIDTH
+from game_src.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, DELTA_FOR_COLLISIONS, \
     MAX_HOOK_LENGTH
-from game_src.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game_src.entities.game_object import GameObject
 from game_src.entities.guns.bullets import Grenade, Bullet
-from game_src.entities.guns.weapons import Pistol, ShotGun, Rocket, MedKit
-from game_src.utils.enums import PlayerStates, Collisions, PlayerData, GameObjectData, TypeData, get_state_by_value
+from game_src.entities.guns.weapons import MedKit
 from game_src.entities.guns.weapons import Pistol, ShotGun, Rocket
 from game_src.utils.enums import PlayerStates, Collisions, PlayerData, GameObjectData, TypeData
+from game_src.utils.enums import get_state_by_value
 from geometry.vector import Vector
 
 

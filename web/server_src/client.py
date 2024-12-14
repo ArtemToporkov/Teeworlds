@@ -1,8 +1,8 @@
 import asyncio
 import json
+
 from game_src.entities.guns.bullets import Bullet
 from game_src.entities.player import Player
-from game_src.utils.enums import TypeData
 from game_src.utils.serialization_tools import get_entity_type
 
 

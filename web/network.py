@@ -1,6 +1,5 @@
 import asyncio
 import json
-import socket
 
 class Network:
     def __init__(self, ip, port):

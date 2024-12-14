@@ -1,14 +1,14 @@
 import asyncio
-from threading import Thread
-
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QFileDialog, QWidget, QCheckBox
-from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import Qt
-from os.path import join
-import web.server_src.server
 import os
 import sys
+from os.path import join
+from threading import Thread
 
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QFileDialog, QWidget, QCheckBox
+
+import web.server_src.server
 from game_src.constants import SERVER_ADDR, ASSETS_PATH
 from game_src.entities.map.map import Map
 

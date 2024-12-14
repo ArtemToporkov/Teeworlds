@@ -1,15 +1,14 @@
-import pygame
-
-from game_src.entities.game_object import GameObject
-from game_src.entities.map.platform import Platform
-import pygame as pg
-
-from game_src.utils.enums import MapData
-from geometry.vector import Vector
-from game_src.constants import ASSETS_PATH, WINDOW_WIDTH, WINDOW_HEIGHT, MAP_WIDTH, MAP_HEIGHT
 from os.path import join
 from typing import Type
-from pathlib import Path
+
+import pygame
+import pygame as pg
+
+from game_src.constants import ASSETS_PATH, WINDOW_WIDTH, WINDOW_HEIGHT, MAP_WIDTH, MAP_HEIGHT
+from game_src.entities.game_object import GameObject
+from game_src.entities.map.platform import Platform
+from game_src.utils.enums import MapData
+from geometry.vector import Vector
 
 
 class Map:

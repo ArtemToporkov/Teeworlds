@@ -9,7 +9,6 @@ from asyncio import Queue
 
 import pygame
 
-from game_src import constants
 from game_src.constants import FPS, SERVER_ADDR, ASSETS_PATH, CURRENT_LEVEL
 from game_src.entities.guns.bullets import Bullet
 from game_src.entities.map.map import Map
