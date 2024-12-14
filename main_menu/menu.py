@@ -1,5 +1,7 @@
 import ctypes
+import os
 import sys
+import time
 from os import environ
 
 import PyQt5
@@ -8,18 +10,27 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.uic import loadUi
 from pathlib import Path
+import multiprocessing
+from enum import Enum, auto
 
 from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT
 from src import background
 
+class Buttons(Enum):
+    START = auto()
+    EDITOR = auto()
+    EXIT = auto()
+
 
 class MainMenu(QMainWindow):
-    def __init__(self):
+    def __init__(self, app: QApplication):
         super().__init__()
+        self.button_clicked = None
         ui = Path("MainMenu.ui")
         loadUi(ui, self)
         self.startButton.clicked.connect(self._start_game)
-        self.editorButton.clicked.connect(self._editor)
+        self.editorButton.clicked.connect(self._open_editor)
+        self.exitButton.clicked.connect(self.close)
         if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
             PyQt5.QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
             # enable highdpi scaling
@@ -40,37 +51,43 @@ class MainMenu(QMainWindow):
         environ["QT_SCREEN_SCALE_FACTORS"] = scaleFactor
 
     def _start_game(self) -> None:
-        from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT
-
-        self.hide()
-        QApplication.exit(0)
-        # self.close()
-
-        from game_src.game import Game
-
-        from pygame import display
-        print(f'width: {WINDOW_WIDTH}, height: {WINDOW_HEIGHT}')
-        screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-        print(display.get_window_size())
-        game = Game(screen)
-
-        game.run()
-
-    def _editor(self) -> None:
-        from levels_editor.editor import Editor
+        self.button_clicked = Buttons.START
         self.close()
-        editor = Editor()
-        editor.show()
+
+    def _open_editor(self) -> None:
+        self.button_clicked = Buttons.EDITOR
+        self.close()
 
 
 def main():
     app = QApplication(sys.argv)
-    window = MainMenu()
+    window = MainMenu(app)
     window.show()
-    # window.setFixedSize(1920, 1080)
-    # window.resize(1920, 1080)
-    # window.update()
-    sys.exit(app.exec_())
+    exit_code = app.exec_()
+
+    match window.button_clicked:
+        case Buttons.START:
+            game_process = multiprocessing.Process(target=_run_game)
+            game_process.start()
+        case Buttons.EDITOR:
+            editor_loc = Path(__file__).parent.parent / 'levels_editor'
+            os.chdir(editor_loc)  # меняем текущую директорию для корректных импортов
+            from levels_editor.editor import main as editor_main
+            editor_main()
+        case _:
+            pass
+
+    sys.exit(exit_code)
+
+
+def _run_game() -> None:
+    from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT
+    from game_src.game import Game
+    from pygame import display
+    screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    game = Game(screen)
+    game.run()
+    pygame.quit()
 
 
 if __name__ == '__main__':
