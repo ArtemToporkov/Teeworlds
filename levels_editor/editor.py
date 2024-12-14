@@ -11,7 +11,7 @@ from PyQt5.uic import loadUi
 from pathlib import Path
 from PyQt5.QtGui import QPixmap
 
-from game_src.constants import ASSETS_PATH
+from game_src.constants import ASSETS_PATH, MAP_HEIGHT, MAP_WIDTH
 from game_src.entities.map.map import Map
 from game_src.entities.map.platform import Platform
 from geometry.vector import Vector
@@ -78,7 +78,7 @@ class Editor(QMainWindow):
 
     def _set_map_scene(self) -> QGraphicsScene:
         scene = QGraphicsScene()
-        scene.setSceneRect(0, 0, 1800, 1300)
+        scene.setSceneRect(0, 0, MAP_WIDTH, MAP_HEIGHT)
         self.map.scale(0.5, 0.5)
         self.map.setScene(scene)
         return scene

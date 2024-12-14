@@ -7,7 +7,8 @@ from pathlib import Path
 
 from pygame.key import ScancodeWrapper
 
-from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, MAX_HP, MAX_DISTANCE_TO_CENTRE_FOR_PLAYER
+from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, MAX_HP, \
+    MAX_DISTANCE_TO_CENTRE_FOR_PLAYER, MAP_WIDTH, MAP_HEIGHT
 from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, HITBOXES_MODE, DELTA_FOR_COLLISIONS, \
     MAX_HOOK_LENGTH
 from game_src.constants import MOVEMENT_SPEED, ASSETS_PATH
@@ -105,7 +106,7 @@ class Player(GameObject):
             self.hp = 100
         self.weapons[self.current_weapon].position = self.position + self.look_direction * 60
         self.weapons[self.current_weapon].direction = self.look_direction
-        if (self.position - self.spawn_position).length() > MAX_DISTANCE_TO_CENTRE_FOR_PLAYER:
+        if self.position.x > MAP_WIDTH or self.position.x < 0 or self.position.y < 0 or self.position.y > MAP_WIDTH:
             self.alive = False
 
     def interact(self, other):

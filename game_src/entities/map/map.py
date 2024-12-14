@@ -6,7 +6,7 @@ import pygame as pg
 
 from game_src.utils.enums import MapData
 from geometry.vector import Vector
-from game_src.constants import ASSETS_PATH
+from game_src.constants import ASSETS_PATH, WINDOW_WIDTH, WINDOW_HEIGHT, MAP_WIDTH, MAP_HEIGHT
 from os.path import join
 from typing import Type
 from pathlib import Path
@@ -43,18 +43,64 @@ class Map:
             MapData.TILE_SIZE.value: self.tile_size,
         }
 
-    def draw(self, screen: pygame.display, center: GameObject) -> None:
-        x = (-(center.position // 2) % (self.image.get_width())).x
-        y = (-(center.position // 2) % (self.image.get_height())).y
-        top_left = Vector(x, y)
+    def draw_boundary(self, screen, offset_x, offset_y):
+        # Настройки цвета и параметров
+        border_color = (255, 0, 0)  # Красный цвет
+        background_color = (100, 0, 0)  # Темный оттенок красного
+        line_thickness = 4
+        dash_length = 15
+        corner_radius = 20  # Радиус скругленных углов
 
-        screen.blit(self.image, (top_left.x, top_left.y))
-        screen.blit(self.image, (top_left.x - self.image.get_width(), top_left.y))
-        screen.blit(self.image, (top_left.x, top_left.y - self.image.get_height()))
-        screen.blit(
-            self.image,
-            (top_left.x - self.image.get_width(), top_left.y - self.image.get_height()),
-        )
+        # Определение границ карты с учетом смещения
+        left = offset_x
+        top = offset_y
+        right = MAP_WIDTH + offset_x
+        bottom = MAP_HEIGHT + offset_y
+
+        # Функция для рисования пунктирной линии
+        def draw_dashed_line(start, end, fixed, is_horizontal):
+            current = start
+            while current < end:
+                dash_end = min(current + dash_length, end)
+                if is_horizontal:
+                    pygame.draw.line(screen, border_color, (current, fixed), (dash_end, fixed), line_thickness)
+                else:
+                    pygame.draw.line(screen, border_color, (fixed, current), (fixed, dash_end), line_thickness)
+                current += 2 * dash_length  # Пропуск между штрихами
+
+        # Рисуем закругленные углы
+        pygame.draw.arc(screen, border_color, (left, top, corner_radius * 2, corner_radius * 2), 3.14, 4.71,
+                        line_thickness)
+        pygame.draw.arc(screen, border_color, (right - corner_radius * 2, top, corner_radius * 2, corner_radius * 2),
+                        4.71, 6.28, line_thickness)
+        pygame.draw.arc(screen, border_color, (left, bottom - corner_radius * 2, corner_radius * 2, corner_radius * 2),
+                        1.57, 3.14, line_thickness)
+        pygame.draw.arc(screen, border_color,
+                        (right - corner_radius * 2, bottom - corner_radius * 2, corner_radius * 2, corner_radius * 2),
+                        0, 1.57, line_thickness)
+
+        # Рисуем пунктирные линии между углами
+        draw_dashed_line(left + corner_radius, right - corner_radius, top, is_horizontal=True)  # Верхняя
+        draw_dashed_line(left + corner_radius, right - corner_radius, bottom, is_horizontal=True)  # Нижняя
+        draw_dashed_line(top + corner_radius, bottom - corner_radius, left, is_horizontal=False)  # Левая
+        draw_dashed_line(top + corner_radius, bottom - corner_radius, right, is_horizontal=False)  # Правая
+
+    def draw(self, screen: pygame.display, center: GameObject) -> None:
+        # Расчет смещения камеры
+        camera_x = max(WINDOW_WIDTH / 2, min(center.position.x, MAP_WIDTH - WINDOW_WIDTH / 2))
+        camera_y = max(WINDOW_HEIGHT / 2, min(center.position.y, MAP_HEIGHT - WINDOW_HEIGHT / 2))
+
+        # Расчет смещения камеры
+        offset_x = -camera_x + WINDOW_WIDTH / 2
+        offset_y = -camera_y + WINDOW_HEIGHT / 2
+
+        # Масштабируем фон под размеры карты
+        scaled_background = pg.transform.scale(self.image, (MAP_WIDTH, MAP_HEIGHT))
+
+        # Отрисовка фона с учетом смещения
+        screen.blit(scaled_background, (offset_x, offset_y))
+
+        # Отрисовка платформ (или других объектов)
         for block in self.platforms:
             block.draw(screen, center)
 

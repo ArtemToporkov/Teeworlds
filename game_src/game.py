@@ -120,6 +120,7 @@ class Game:
     def draw(self) -> None:
         self.screen.fill((0, 0, 0))
         self.map.draw(self.screen, self.player)
+        # Вычисляем смещение от центра карты
         map_objects = [*self.players.values(), self.player, *self.bullets]
         for obj in map_objects:
             if obj is not None:
