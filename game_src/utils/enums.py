@@ -43,9 +43,10 @@ class BlowingBulletData(Enum):
 @enum.unique
 class PlayerStates(Enum):
     STANDING = auto()
-    RUNNING_RIGHT = auto()
-    RUNNING_LEFT = auto()
-    JUMPING = auto()
+    RUNNING = auto()
+    IN_AIR = auto()
+    LOOKING_RIGHT = auto()
+    LOOKING_LEFT = auto()
 
 
 class Collisions(Enum):
