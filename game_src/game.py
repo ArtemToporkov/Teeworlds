@@ -121,7 +121,6 @@ class Game:
     def draw(self) -> None:
         self.screen.fill((0, 0, 0))
         self.map.draw(self.screen, self.player)
-        # Вычисляем смещение от центра карты
         map_objects = [*self.players.values(), self.player, *self.bullets]
         for obj in map_objects:
             if obj is not None:
@@ -155,8 +154,10 @@ class Game:
             if isinstance(entity, Player):
                 ids.append(wrap['id'])
                 if wrap['id'] not in self.players.keys():
+                    # print(wrap['id'])
                     self.players[wrap['id']] = entity
                 else:
+                    # print(f'update: {wrap['id']}')
                     self.players[wrap['id']].update_from_wrap(entity)
             elif isinstance(entity, Bullet):
                 self.bullets.append(entity)

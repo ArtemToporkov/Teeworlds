@@ -28,6 +28,8 @@ class PlayerData(Enum):
     CURRENT_WEAPON = 'current_weapon'
     HOOK_POSITION = 'hook_position'
     HP = 'hp'
+    FORCE_VECTOR = 'force_vector'
+    HOOK_VECTOR = 'hook_vector'
 
 
 

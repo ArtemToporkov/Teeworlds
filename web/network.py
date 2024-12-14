@@ -23,7 +23,6 @@ class Network:
             await self.writer.drain()
         except Exception as e:
             print(f"Send error: {e}")
-            raise e
 
     async def receive(self):
         try:

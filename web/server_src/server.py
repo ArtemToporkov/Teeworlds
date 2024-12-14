@@ -19,7 +19,7 @@ class Server:
         self.running = False
         self.free_id = 0
 
-        self.map = Map.load_from_file(os.path.join(ASSETS_PATH, "maps", "checking.json"))
+        self.map = Map.load_from_file(os.path.join("maps", "first level.json"))
 
         self.players = dict()
         self.entities_to_send = dict()

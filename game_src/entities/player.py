@@ -36,7 +36,6 @@ class Player(GameObject):
         self.hook_position = None
         self.is_landed = False
         self.hook_vector = None
-        self.hook_buffer = Vector(0, 0)
 
         self.weapons = [
             Pistol(0, 0, 50, 50, os.path.join(ASSETS_PATH, "weapons", "pistol.png")),
@@ -63,7 +62,7 @@ class Player(GameObject):
     def draw(self, screen: pygame.display, center: GameObject) -> None:
         new_position = self.get_coordinates_offset_by_center(center)
         if self.hook_position:
-            self._draw_hook(screen)
+            self._draw_hook(screen, center)
         if HITBOXES_MODE:
             self._draw_move_force_vector(screen)
         self.weapons[self.current_weapon].draw(screen, center)
@@ -280,7 +279,7 @@ class Player(GameObject):
                 self.looking_direction = PlayerStates.LOOKING_LEFT
             if d_pressed:
                 self.looking_direction = PlayerStates.LOOKING_RIGHT
-            print(self.looking_direction, self.state)
+            # print(self.looking_direction, self.state)
             return
         if a_pressed:
             self.state = PlayerStates.RUNNING
@@ -314,12 +313,12 @@ class Player(GameObject):
             self.hook_position = Vector(new_x, new_y)
             self.hook_vector = (self.hook_position - self.position).normalize()
 
-    def _draw_hook(self, screen: pygame.display) -> None:
+    def _draw_hook(self, screen: pygame.display, center) -> None:
         pygame.draw.line(
             screen,
             (255, 255, 255),
-            (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2),
-            (self.hook_position.x + WINDOW_WIDTH / 2 - self.position.x, self.hook_position.y + WINDOW_HEIGHT / 2 - self.position.y),
+            (self.position - center.position + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2).to_tuple(),
+            (self.hook_position - center.position + Vector(WINDOW_WIDTH, WINDOW_HEIGHT) / 2).to_tuple(),
             2,
         )
 
@@ -345,10 +344,12 @@ class Player(GameObject):
         self.sprite_path = player.sprite_path
         self.state = player.state
         self.current_weapon = player.current_weapon
-        # if not player.hook_end:
-        #     self.hook = None
-        # elif not self.hook:
-        #     self.hook = Hook(self, wrap.hook_end)
+        self.move_force_vector = player.move_force_vector
+        self.hook_vector = player.hook_vector
+        if player.hook_position:
+            self.hook_position = player.hook_position
+        else:
+            self.hook_position = None
 
     def to_dict(self):
         data = super().to_dict()
@@ -357,12 +358,13 @@ class Player(GameObject):
             PlayerData.STATE.value: self.state.value,
             PlayerData.CURRENT_WEAPON.value: self.current_weapon,
             PlayerData.HP.value: self.hp,
+            PlayerData.FORCE_VECTOR.value: self.move_force_vector.to_tuple()
         })
 
-        # if self.hook_position:
-        #     data[PlayerData.HOOK_POSITION.value] = self.hook_position
-        # if self.hook_position:
-        #     data[PlayerData.HOOK_POSITION]
+        if self.hook_position:
+            data[PlayerData.HOOK_POSITION.value] = self.hook_position.to_tuple()
+        if self.hook_vector:
+            data[PlayerData.HOOK_VECTOR.value] = self.hook_vector.to_tuple()
         return data
 
     @staticmethod
@@ -378,6 +380,10 @@ class Player(GameObject):
         player.state = get_state_by_value(data[PlayerData.STATE.value])
         player.current_weapon = data[PlayerData.CURRENT_WEAPON.value]
         player.hp = data[PlayerData.HP.value]
-        # player.hook_position = data[PlayerData.HOOK_POSITION.value]
+        player.move_force_vector = Vector(*data[PlayerData.FORCE_VECTOR.value])
+        if data.get(PlayerData.HOOK_POSITION.value):
+            player.hook_position = Vector(*data[PlayerData.HOOK_POSITION.value])
+        if data.get(PlayerData.HOOK_VECTOR.value):
+            player.hook_vector = Vector(*data[PlayerData.HOOK_VECTOR.value])
 
         return player

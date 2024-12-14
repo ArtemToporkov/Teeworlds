@@ -116,16 +116,16 @@ class ServerUI(QMainWindow):
 
     def select_map(self):
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Select Map", join(ASSETS_PATH, "maps"), "JSON_files (*.json)"
+            self, "Select Map", "./maps", "JSON_files (*.json)"
         )
         if file_path:
             self.server.map = Map.load_from_file(file_path)
 
     def preload_map(self):
         path = None
-        base_map = "checking.json"
+        base_map = "first level.json"
         try:
-            path = join(ASSETS_PATH, "maps", base_map)
+            path = join("maps", base_map)
         except FileNotFoundError:
             print(f'Map: {base_map}, not found')
             for file in os.listdir(path):
