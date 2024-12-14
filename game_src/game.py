@@ -15,6 +15,7 @@ from game_src.entities.guns.bullets import Bullet
 from game_src.entities.map.map import Map
 from game_src.entities.player import Player
 from game_src.utils.serialization_tools import get_entity
+from geometry.vector import Vector
 from web.network import Network
 
 
@@ -89,6 +90,8 @@ class Game:
         if not self.player.alive:
             self.player.position = self.map.spawn_position
             self.player.alive = True
+            self.player.velocity = Vector(0, 0)
+            self.player.move_force_vector = Vector(0, 0)
         for bullet in self.bullets:
             bullet.update()
             if not bullet.alive:

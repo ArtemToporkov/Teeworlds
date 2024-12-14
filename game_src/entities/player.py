@@ -7,7 +7,7 @@ from pathlib import Path
 
 from pygame.key import ScancodeWrapper
 
-from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, MAX_HP
+from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, MAX_HP, MAX_DISTANCE_TO_CENTRE_FOR_PLAYER
 from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, HITBOXES_MODE, DELTA_FOR_COLLISIONS, \
     MAX_HOOK_LENGTH
 from game_src.constants import MOVEMENT_SPEED, ASSETS_PATH
@@ -24,6 +24,7 @@ class Player(GameObject):
     def __init__(self, x, y, width, height):
         player_sprite_path = Path(__file__).parent.parent.parent / 'assets' / 'player' / 'standing.png'
         super().__init__(x, y, width=width, height=height, sprite_path=player_sprite_path)
+        self.spawn_position = Vector(x, y)
         self.sprite = pygame.image.load(player_sprite_path)
         self.sprite = pygame.transform.scale(self.sprite, (width, height))
         self.state = PlayerStates.STANDING
@@ -96,14 +97,16 @@ class Player(GameObject):
                           10 * self.move_force_vector.y + WINDOW_HEIGHT / 2))
 
     def update(self):
+        # print(f'position: {self.position}')
+        # print(f'force vector: {self.move_force_vector}')
         self.cooldown -= 1
         if self.hp <= 0:
             self.alive = False
             self.hp = 100
         self.weapons[self.current_weapon].position = self.position + self.look_direction * 60
         self.weapons[self.current_weapon].direction = self.look_direction
-        if self.position.length() > 2000:
-            self.hp -= 1000
+        if (self.position - self.spawn_position).length() > MAX_DISTANCE_TO_CENTRE_FOR_PLAYER:
+            self.alive = False
 
     def interact(self, other):
         from game_src.entities.guns.bullets import Bullet, BlowingBullet
