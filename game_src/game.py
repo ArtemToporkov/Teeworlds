@@ -18,7 +18,7 @@ from game_src.utils.serialization_tools import get_entity
 from web.network import Network
 
 
-MULTIPLAYER = True
+MULTIPLAYER = False
 
 
 class Game:
