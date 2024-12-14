@@ -7,8 +7,42 @@
         {
             "type_entity": "Platform",
             "id": null,
-            "pos_x": 543.0,
-            "pos_y": 775.0,
+            "pos_x": 1091.0,
+            "pos_y": 516.5,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 198,
+            "height": 163,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\1.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 557.0,
+            "pos_y": 512.5,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 198,
+            "height": 163,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\1.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 573.0,
+            "pos_y": 771.0,
             "velocity": [
                 0,
                 0
@@ -24,53 +58,19 @@
         {
             "type_entity": "Platform",
             "id": null,
-            "pos_x": 1140.5,
-            "pos_y": 504.5,
+            "pos_x": 575.0,
+            "pos_y": 315.0,
             "velocity": [
                 0,
                 0
             ],
-            "width": 195,
-            "height": 135,
+            "width": 670,
+            "height": 106,
             "direction": [
                 0,
                 1
             ],
-            "sprite_path": "editor\\6.png"
-        },
-        {
-            "type_entity": "Platform",
-            "id": null,
-            "pos_x": 394.5,
-            "pos_y": 500.5,
-            "velocity": [
-                0,
-                0
-            ],
-            "width": 195,
-            "height": 135,
-            "direction": [
-                0,
-                1
-            ],
-            "sprite_path": "editor\\6.png"
-        },
-        {
-            "type_entity": "Platform",
-            "id": null,
-            "pos_x": 660.5,
-            "pos_y": 201.0,
-            "velocity": [
-                0,
-                0
-            ],
-            "width": 415,
-            "height": 178,
-            "direction": [
-                0,
-                1
-            ],
-            "sprite_path": "editor\\7.png"
+            "sprite_path": "editor\\3.png"
         }
     ],
     "tile_size": 50

@@ -70,7 +70,7 @@ class Game:
             self.update_entities()
             pygame.display.flip()
             self.clock.tick(FPS)
-            #TODO Жоско полистать тикток
+            # TODO: жоско полистать тикток
 
     def interact_entities(self, *entities: 'GameObject') -> None:
         for first in entities:

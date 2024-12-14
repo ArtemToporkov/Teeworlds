@@ -28,7 +28,7 @@ class Player(GameObject):
         self.sprite = pygame.transform.scale(self.sprite, (width, height))
         self.state = PlayerStates.STANDING
         self.move_force_vector = Vector(0, 0)
-        self.jumped = False
+        self.jumped = True
         self.in_air = False
         self.hook_position = None
         self.is_landed = False
@@ -102,7 +102,7 @@ class Player(GameObject):
             self.hp = 100
         self.weapons[self.current_weapon].position = self.position + self.look_direction * 60
         self.weapons[self.current_weapon].direction = self.look_direction
-        if self.position.length() > 2000:
+        if self.position.length() > 10000:
             self.hp -= 1000
 
     def interact(self, other):
@@ -138,8 +138,6 @@ class Player(GameObject):
                 other.alive = False
                 self.hp -= other.damage
 
-    def move_by_coordinates(self, dx, dy):
-        self.position += Vector(dx, dy)
 
     def create_frames_list(self, frames_path: Path) -> list[pygame.image]:
         frames = []
@@ -175,12 +173,12 @@ class Player(GameObject):
         a_pressed, d_pressed, w_pressed = pressed_keys[pygame.K_a], pressed_keys[pygame.K_d], pressed_keys[pygame.K_w]
         shift_pressed = pressed_keys[pygame.K_LSHIFT]
 
-        # if shift_pressed:
-        #     if not self.hook_position:
-        #         self._handle_hook(platforms, mouse_pos)
-        # else:
-        #     self.hook_position = None
-        #     self.hook_vector = None
+        if shift_pressed:
+            if not self.hook_position:
+                self._handle_hook(platforms, mouse_pos)
+        else:
+            self.hook_position = None
+            self.hook_vector = None
 
         if a_pressed:
             self.move_force_vector = Vector(
@@ -214,32 +212,48 @@ class Player(GameObject):
                 min(self.move_force_vector.y + GRAVITY, 3 * MOVEMENT_SPEED)
             )
 
+        is_landed_flag = False
         for platform in platforms:
             collisions = platform.get_collisions(self, self.move_force_vector)
+            x_collision = False
             if collisions[Collisions.X_LEFT] is not None and self.move_force_vector.x < 0:
-                self.move_force_vector = Vector(
-                    platform.top_right.x - self.position.x + DELTA_FOR_COLLISIONS,
-                    self.move_force_vector.y
+                self.position = Vector(
+                    platform.top_right.x + DELTA_FOR_COLLISIONS,
+                    self.position.y
                 )
-            if collisions[Collisions.X_RIGHT] is not None and self.move_force_vector.x > 0:
-                self.move_force_vector = Vector(
-                    platform.top_left.x - self.top_right.x - DELTA_FOR_COLLISIONS,
-                    self.move_force_vector.y
+                x_collision = True
+            elif collisions[Collisions.X_RIGHT] is not None and self.move_force_vector.x > 0:
+                self.position = Vector(
+                    platform.top_left.x - DELTA_FOR_COLLISIONS - self.width,
+                    self.position.y
                 )
+                x_collision = True
+
+            y_collision = False
             if collisions[Collisions.Y_DOWN] is not None and self.move_force_vector.y > 0:
-                self.move_force_vector = Vector(
-                    self.move_force_vector.x,
-                    platform.top_right.y - self.bottom_right.y - DELTA_FOR_COLLISIONS
+                self.position = Vector(
+                    self.position.x,
+                    platform.top_left.y - DELTA_FOR_COLLISIONS - self.height
                 )
                 self.is_landed = True
                 self.jumped = False
+                y_collision = True
             if collisions[Collisions.Y_UP] is not None and self.move_force_vector.y < 0:
-                self.move_force_vector = Vector(
-                    self.move_force_vector.x,
-                    platform.bottom_left.y - self.top_left.y + DELTA_FOR_COLLISIONS
+                self.position = Vector(
+                    self.position.x,
+                    platform.bottom_left.y + DELTA_FOR_COLLISIONS
                 )
+                y_collision = True
+
+            self.move_force_vector = Vector(
+                self.move_force_vector.x if not x_collision else 0,
+                self.move_force_vector.y if not y_collision else 0
+            )
+
+            is_landed_flag = is_landed_flag or platform.move_and_check_collisions(self, 0, 5)
+            self.is_landed = is_landed_flag
+
         self.move(self.move_force_vector)
-        print(self.move_force_vector)
 
     def _handle_hook(self, platforms: list["Platform"], mouse_pos: tuple[int, int]):
         self.hook_position = (
