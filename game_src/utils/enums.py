@@ -32,7 +32,6 @@ class PlayerData(Enum):
     HOOK_VECTOR = 'hook_vector'
 
 
-
 class BulletData(Enum):
     DAMAGE = 'damage'
     DIRECTION = 'direction'
