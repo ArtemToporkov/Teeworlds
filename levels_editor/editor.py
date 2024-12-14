@@ -107,7 +107,7 @@ class Editor(QMainWindow):
             map_name = dialog.textValue()
             if map_name:
                 map = Map(list(self.platforms.values()), Vector(self.spawn.x(), self.spawn.y()))
-                with open(os.path.join(ASSETS_PATH, 'maps', f'{map_name}.json'), 'w') as file:
+                with open(str(Path(__file__).parent.parent / 'maps' / f'{map_name}.json'), 'w') as file:
                     js = json.dumps(map.to_dict(), indent=4)
                     file.write(js)
             else:

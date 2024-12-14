@@ -26,6 +26,7 @@ MAP_WIDTH = 1800
 MAP_HEIGHT = 1300
 
 ASSETS_PATH = _find_assets_folder()
+CURRENT_LEVEL = "first level"
 GRAVITY = 0.6
 HITBOXES_MODE = True
 SERVER_ADDR = ("localhost", 8686)

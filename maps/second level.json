@@ -1,0 +1,145 @@
+{
+    "spawn_position": [
+        800.0,
+        500.0
+    ],
+    "platforms": [
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 692.5,
+            "pos_y": 778.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 99,
+            "height": 116,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\5.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 874.5,
+            "pos_y": 1023.5,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 99,
+            "height": 117,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\4.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 726.5,
+            "pos_y": 1206.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 99,
+            "height": 116,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\5.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 6.5,
+            "pos_y": 967.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 415,
+            "height": 178,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\7.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 1186.5,
+            "pos_y": 829.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 415,
+            "height": 178,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\7.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 253.0,
+            "pos_y": 422.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 226,
+            "height": 176,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\8.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 1170.5,
+            "pos_y": 372.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 99,
+            "height": 116,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\5.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 536.5,
+            "pos_y": 118.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 99,
+            "height": 116,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\5.png"
+        }
+    ],
+    "tile_size": 50
+}

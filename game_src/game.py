@@ -9,7 +9,7 @@ from asyncio import Queue
 
 import pygame
 
-from game_src.constants import FPS, HITBOXES_MODE, SERVER_ADDR, ASSETS_PATH
+from game_src.constants import FPS, HITBOXES_MODE, SERVER_ADDR, ASSETS_PATH, CURRENT_LEVEL
 from game_src.entities.guns.bullets import Bullet
 from game_src.entities.map.map import Map
 from game_src.entities.player import Player
@@ -30,7 +30,7 @@ class Game:
         self.entities = []
         self.bullets = []
         self.players = dict()
-        self.map = Map.load_from_file(os.path.join(ASSETS_PATH, 'maps', 'checking.json'))
+        self.map = Map.load_from_file(str(Path(__file__).parent.parent / 'maps' / f'{CURRENT_LEVEL}.json'))
         self.player = Player(self.map.spawn_position.x,  self.map.spawn_position.y, 48, 48)
         self.entities = [self.player, *self.map.platforms]
 
