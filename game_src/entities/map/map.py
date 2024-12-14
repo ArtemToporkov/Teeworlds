@@ -86,21 +86,18 @@ class Map:
         draw_dashed_line(top + corner_radius, bottom - corner_radius, right, is_horizontal=False)  # Правая
 
     def draw(self, screen: pygame.display, center: GameObject) -> None:
-        # Расчет смещения камеры
         camera_x = max(WINDOW_WIDTH / 2, min(center.position.x, MAP_WIDTH - WINDOW_WIDTH / 2))
         camera_y = max(WINDOW_HEIGHT / 2, min(center.position.y, MAP_HEIGHT - WINDOW_HEIGHT / 2))
 
-        # Расчет смещения камеры
         offset_x = -camera_x + WINDOW_WIDTH / 2
         offset_y = -camera_y + WINDOW_HEIGHT / 2
 
-        # Масштабируем фон под размеры карты
-        scaled_background = pg.transform.scale(self.image, (MAP_WIDTH, MAP_HEIGHT))
+        background_width = MAP_WIDTH + WINDOW_WIDTH
+        background_height = MAP_HEIGHT + WINDOW_HEIGHT
 
-        # Отрисовка фона с учетом смещения
-        screen.blit(scaled_background, (offset_x, offset_y))
+        scaled_background = pg.transform.scale(self.image, (background_width, background_height))
 
-        # Отрисовка платформ (или других объектов)
+        screen.blit(scaled_background, (offset_x - WINDOW_WIDTH / 2, offset_y - WINDOW_HEIGHT / 2))
+
         for block in self.platforms:
             block.draw(screen, center)
-
