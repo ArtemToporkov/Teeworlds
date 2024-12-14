@@ -8,7 +8,6 @@ from pathlib import Path
 from asyncio import Queue
 
 import pygame
-from line_profiler import profile
 
 from game_src.constants import FPS, HITBOXES_MODE, SERVER_ADDR, ASSETS_PATH
 from game_src.entities.guns.bullets import Bullet
@@ -72,7 +71,7 @@ class Game:
             self.update_entities()
             pygame.display.flip()
             self.clock.tick(FPS)
-            #TODO Жоско полистать тикток
+            # TODO: жоско полистать тикток
 
     def interact_entities(self, *entities: 'GameObject') -> None:
         for first in entities:
@@ -126,7 +125,6 @@ class Game:
             if obj is not None:
                 obj.draw(self.screen, self.player)
 
-    @profile
     async def send_player_state(self):
         while True:
             to_send = self.player.to_dict()
@@ -138,7 +136,6 @@ class Game:
 
             await asyncio.sleep(1 / FPS)
 
-    @profile
     async def process_server_messages(self):
         while True:
             try:

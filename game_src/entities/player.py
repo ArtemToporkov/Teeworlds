@@ -29,8 +29,9 @@ class Player(GameObject):
         self.sprite = pygame.image.load(player_sprite_path)
         self.sprite = pygame.transform.scale(self.sprite, (width, height))
         self.state = PlayerStates.STANDING
+        self.looking_direction = PlayerStates.LOOKING_RIGHT
         self.move_force_vector = Vector(0, 0)
-        self.jumped = False
+        self.jumped = True
         self.in_air = False
         self.hook_position = None
         self.is_landed = False
@@ -72,22 +73,24 @@ class Player(GameObject):
         pg.draw.rect(screen, color, hp_bar)
 
         match self.state:
-            case PlayerStates.RUNNING_RIGHT | PlayerStates.RUNNING_LEFT:
+            case PlayerStates.RUNNING:
                 frame = self.running_frames[self.current_running_frame]
                 frame = pygame.transform.flip(frame, True, False) \
-                    if self.state == PlayerStates.RUNNING_LEFT \
+                    if self.looking_direction == PlayerStates.LOOKING_LEFT \
                     else frame
                 screen.blit(frame, (new_position.x, new_position.y, self.width, self.height))
                 self._update_running_frame()
-            case PlayerStates.JUMPING:
+            case PlayerStates.IN_AIR:
                 frame = self.jumping_frames[self.current_jumping_frame]
                 frame = pygame.transform.flip(frame, True, False) \
-                    if self.state == PlayerStates.RUNNING_LEFT \
+                    if self.looking_direction == PlayerStates.LOOKING_LEFT \
                     else frame
                 screen.blit(frame, (new_position.x, new_position.y, self.width, self.height))
                 self._update_jumping_frame()
             case PlayerStates.STANDING:
-                screen.blit(self.sprite, (new_position.x, new_position.y, self.width, self.height))
+                sprite = self.sprite if self.looking_direction == PlayerStates.LOOKING_RIGHT \
+                    else pygame.transform.flip(self.sprite, True, False)
+                screen.blit(sprite, (new_position.x, new_position.y, self.width, self.height))
             case _:
                 pass
 
@@ -142,9 +145,6 @@ class Player(GameObject):
                 other.alive = False
                 self.hp -= other.damage
 
-    def move_by_coordinates(self, dx, dy):
-        self.position += Vector(dx, dy)
-
     def create_frames_list(self, frames_path: Path) -> list[pygame.image]:
         frames = []
         for frame_file in sorted(
@@ -180,139 +180,141 @@ class Player(GameObject):
         shift_pressed = pressed_keys[pygame.K_LSHIFT]
 
         if shift_pressed:
-            if not self.hook_position:
-                self._handle_hook(platforms, mouse_pos)
+            self._handle_hook(platforms, mouse_pos, self.hook_position is not None)
             if self.hook_vector:
                 self.move_force_vector += self.hook_vector
+                self.move_force_vector = Vector(
+                    max(-MOVEMENT_SPEED, self.move_force_vector.x) if self.move_force_vector.x < 0
+                    else min(MOVEMENT_SPEED, self.move_force_vector.x),
+                    max(-MOVEMENT_SPEED, self.move_force_vector.y) if self.move_force_vector.y < 0
+                    else min(MOVEMENT_SPEED, self.move_force_vector.y)
+                )
         else:
             self.hook_position = None
             self.hook_vector = None
 
-        if a_pressed:
-            self.move_force_vector = Vector(
-                max(self.move_force_vector.x - 1, -MOVEMENT_SPEED),
-                self.move_force_vector.y
-            )
-        elif d_pressed:
-            self.move_force_vector = Vector(
-                min(self.move_force_vector.x + 1, MOVEMENT_SPEED),
-                self.move_force_vector.y
-            )
-        else:
-            self.move_force_vector = Vector(
-                self.move_force_vector.x - self.move_force_vector.x / abs(self.move_force_vector.x)
-                if self.move_force_vector.x != 0
-                else 0,
-                self.move_force_vector.y
-            )
+        if all(not pressed for pressed in (a_pressed, d_pressed, w_pressed, shift_pressed)) and self.is_landed:
+            self.state = PlayerStates.STANDING
+            self.move_force_vector = Vector(0, 0)
+            return
 
-        if w_pressed and not self.jumped:
-            self.move_force_vector = Vector(
-                self.move_force_vector.x,
-                self.move_force_vector.y - JUMP_STRENGTH
-            )
-            self.jumped = True
-            self.is_landed = False
-
-        if not self.is_landed:
-            self.move_force_vector = Vector(
-                self.move_force_vector.x,
-                min(self.move_force_vector.y + GRAVITY, 3 * MOVEMENT_SPEED)
-            )
-
-        for platform in platforms:
-            collisions = platform.get_collisions(self, self.move_force_vector)
-            if collisions[Collisions.X_LEFT] is not None and self.move_force_vector.x < 0:
+        if self.hook_vector is None:
+            if a_pressed:
                 self.move_force_vector = Vector(
-                    platform.top_right.x - self.position.x + DELTA_FOR_COLLISIONS,
+                    max(self.move_force_vector.x - 1, -MOVEMENT_SPEED),
                     self.move_force_vector.y
                 )
-            if collisions[Collisions.X_RIGHT] is not None and self.move_force_vector.x > 0:
+            elif d_pressed:
                 self.move_force_vector = Vector(
-                    platform.top_left.x - self.top_right.x - DELTA_FOR_COLLISIONS,
+                    min(self.move_force_vector.x + 1, MOVEMENT_SPEED),
                     self.move_force_vector.y
                 )
-            if collisions[Collisions.Y_DOWN] is not None and self.move_force_vector.y > 0:
+
+            if w_pressed and not self.jumped:
                 self.move_force_vector = Vector(
                     self.move_force_vector.x,
-                    platform.top_right.y - self.bottom_right.y - DELTA_FOR_COLLISIONS
+                    self.move_force_vector.y - JUMP_STRENGTH
+                )
+                self.jumped = True
+                self.is_landed = False
+
+            if not self.is_landed:
+                self.move_force_vector = Vector(
+                    self.move_force_vector.x,
+                    min(self.move_force_vector.y + GRAVITY, 3 * MOVEMENT_SPEED)
+                )
+
+        is_landed_flag = False
+        for platform in platforms:
+            collisions = platform.get_collisions(self, self.move_force_vector)
+            x_collision = False
+            if collisions[Collisions.X_LEFT] is not None and self.move_force_vector.x < 0:
+                self.position = Vector(
+                    platform.top_right.x + DELTA_FOR_COLLISIONS,
+                    self.position.y
+                )
+                x_collision = True
+            elif collisions[Collisions.X_RIGHT] is not None and self.move_force_vector.x > 0:
+                self.position = Vector(
+                    platform.top_left.x - DELTA_FOR_COLLISIONS - self.width,
+                    self.position.y
+                )
+                x_collision = True
+
+            y_collision = False
+            if collisions[Collisions.Y_DOWN] is not None and self.move_force_vector.y > 0:
+                self.position = Vector(
+                    self.position.x,
+                    platform.top_left.y - DELTA_FOR_COLLISIONS - self.height
                 )
                 self.is_landed = True
                 self.jumped = False
+                y_collision = True
             if collisions[Collisions.Y_UP] is not None and self.move_force_vector.y < 0:
-                self.move_force_vector = Vector(
-                    self.move_force_vector.x,
-                    platform.bottom_left.y - self.top_left.y + DELTA_FOR_COLLISIONS
+                self.position = Vector(
+                    self.position.x,
+                    platform.bottom_left.y + DELTA_FOR_COLLISIONS
                 )
+                y_collision = True
+
+            self.move_force_vector = Vector(
+                self.move_force_vector.x if not x_collision else 0,
+                self.move_force_vector.y if not y_collision else 0
+            )
+
+            is_landed_flag = is_landed_flag or platform.move_and_check_collisions(self, 0, 5)
+            self.is_landed = is_landed_flag
+        self._set_looking_direction_for_animations(a_pressed, d_pressed, w_pressed, shift_pressed, self.is_landed)
         self.move(self.move_force_vector)
 
-    def _handle_hook(self, platforms: list["Platform"], mouse_pos: tuple[int, int]):
-        self.hook_position = Vector(mouse_pos[0], mouse_pos[1]) - Vector(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
-        self.hook_position = self.hook_position.normalize() * MAX_HOOK_LENGTH
-        self.hook_vector = Vector(self.hook_position.x, self.hook_position.y)
-        self.hook_position += self.position
-        hook_parts_count = 6
-        collisions = {col: None for col in [Collisions.X_RIGHT, Collisions.X_LEFT, Collisions.Y_UP, Collisions.Y_DOWN]}
-        for i in range(1, hook_parts_count):
-            new = self.hook_vector.normalize() * i * MAX_HOOK_LENGTH / (hook_parts_count - 1)
-            for platform in platforms:
-                intersects_block = platform.move_and_check_collisions(GameObject(
-                    self.position.x + self.width / 2, self.position.y + self.height / 2, 0, 0
-                ), new.x, new.y)
-                if intersects_block:
-                    if self.hook_vector.x < 0:
-                        collisions[Collisions.X_LEFT] = platform.top_right.x \
-                            if collisions[Collisions.X_LEFT] is None and self.position.x > platform.top_right.x \
-                            else collisions[Collisions.X_LEFT]
-                    if self.hook_vector.x > 0:
-                        collisions[Collisions.X_RIGHT] = platform.top_left.x \
-                            if collisions[Collisions.X_RIGHT] is None and self.position.x < platform.top_left.x \
-                            else collisions[Collisions.X_RIGHT]
-                    if self.hook_vector.y > 0:
-                        collisions[Collisions.Y_DOWN] = platform.top_right.y \
-                            if collisions[Collisions.Y_DOWN] is None and self.position.y < platform.top_right.y \
-                            else collisions[Collisions.Y_DOWN]
-                    if self.hook_vector.y < 0:
-                        collisions[Collisions.Y_UP] = platform.bottom_left.y \
-                            if collisions[Collisions.Y_UP] is None and self.position.y > platform.bottom_left.y \
-                            else collisions[Collisions.Y_UP]
+    def _set_looking_direction_for_animations(
+            self,
+            a_pressed: bool,
+            d_pressed: bool,
+            w_pressed: bool,
+            shift_pressed: bool,
+            is_landed: bool):
+        if not is_landed or w_pressed:
+            self.state = PlayerStates.IN_AIR
+            if a_pressed:
+                self.looking_direction = PlayerStates.LOOKING_LEFT
+            if d_pressed:
+                self.looking_direction = PlayerStates.LOOKING_RIGHT
+            print(self.looking_direction, self.state)
+            return
+        if a_pressed:
+            self.state = PlayerStates.RUNNING
+            self.looking_direction = PlayerStates.LOOKING_LEFT
+        elif d_pressed:
+            self.state = PlayerStates.RUNNING
+            self.looking_direction = PlayerStates.LOOKING_RIGHT
 
-        if all(collisions[key] is None for key in collisions.keys()):
+    def _handle_hook(self, platforms: list["Platform"], mouse_pos: tuple[int, int], already_hooked: bool):
+        self.hook_position = (
+                Vector(mouse_pos[0], mouse_pos[1]) - Vector(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
+        ).normalize() * MAX_HOOK_LENGTH if not already_hooked else self.hook_position - self.position
+        self.hook_vector = Vector(self.hook_position.x, self.hook_position.y)  # позиция относительно (0,0)
+        self.hook_position += self.position  # позиция относительно игрока
+        hook_parts_count = 100
+        new_x, new_y = None, None
+        for i in range(1, hook_parts_count):
+            # сужаем крюк, всё слишком дискретно, зато работает безотказно
+            new = self.hook_vector.normalize() * i * MAX_HOOK_LENGTH / (hook_parts_count - 1) + self.position
+            for platform in platforms:
+                if new_x is not None and new_y is not None:
+                    break
+                # учитываем то, что позиция закреплена на левым верхним углом игрока
+                if platform.top_left.x <= new.x + self.width / 2 <= platform.top_right.x \
+                        and platform.top_left.y <= new.y + self.height / 2 <= platform.bottom_right.y:
+                    new_x, new_y = new.x, new.y
+        if new_x is None and new_y is None:
             self.hook_position = None
             self.hook_vector = None
-            return
-
-        if collisions[Collisions.X_LEFT] is not None:
-            self.hook_position = Vector(
-                collisions[Collisions.X_LEFT] - self.width / 2,
-                self.hook_position.y
-            )
-        elif collisions[Collisions.X_RIGHT] is not None:
-            self.hook_position = Vector(
-                collisions[Collisions.X_RIGHT] - self.width / 2,
-                self.hook_position.y
-            )
-        if collisions[Collisions.Y_DOWN] is not None:
-            self.hook_position = Vector(
-                self.hook_position.x,
-                collisions[Collisions.Y_DOWN] - self.height / 2
-            )
-        elif collisions[Collisions.Y_UP] is not None:
-            self.hook_position = Vector(
-                self.hook_position.x,
-                collisions[Collisions.Y_UP] - self.height / 2
-            )
-        self.hook_vector = (self.hook_position - self.position).normalize()
+        else:
+            self.hook_position = Vector(new_x, new_y)
+            self.hook_vector = (self.hook_position - self.position).normalize()
 
     def _draw_hook(self, screen: pygame.display) -> None:
-        for i in range(1, 6):
-            new = self.hook_position.normalize() * i * MAX_HOOK_LENGTH / 5 + Vector(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2) + self.position
-            pygame.draw.circle(
-                screen,
-                (255, 255, 255),
-                (new.x, new.y),
-                3
-            )
         pygame.draw.line(
             screen,
             (255, 255, 255),
@@ -327,7 +329,7 @@ class Player(GameObject):
             self.current_running_frame = 0
 
     def _update_jumping_frame(self) -> None:
-        if self.state != PlayerStates.JUMPING or not self.jumped:
+        if self.state != PlayerStates.IN_AIR or not self.jumped:
             self.current_jumping_frame = 0
         elif self.current_jumping_frame == 11:
             return

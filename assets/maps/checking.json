@@ -7,8 +7,42 @@
         {
             "type_entity": "Platform",
             "id": null,
-            "pos_x": 549.0,
-            "pos_y": 761.0,
+            "pos_x": 1091.0,
+            "pos_y": 516.5,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 198,
+            "height": 163,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\1.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 557.0,
+            "pos_y": 512.5,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 198,
+            "height": 163,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\1.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 573.0,
+            "pos_y": 771.0,
             "velocity": [
                 0,
                 0
@@ -24,19 +58,19 @@
         {
             "type_entity": "Platform",
             "id": null,
-            "pos_x": 1244.5,
-            "pos_y": 568.5,
+            "pos_x": 575.0,
+            "pos_y": 315.0,
             "velocity": [
                 0,
                 0
             ],
-            "width": 195,
-            "height": 135,
+            "width": 670,
+            "height": 106,
             "direction": [
                 0,
                 1
             ],
-            "sprite_path": "editor\\6.png"
+            "sprite_path": "editor\\3.png"
         }
     ],
     "tile_size": 50

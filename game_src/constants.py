@@ -12,7 +12,7 @@ def _find_assets_folder():
     raise FileNotFoundError("Папка 'assets' не найдена.")
 
 
-DELTA_FOR_COLLISIONS = 1
+DELTA_FOR_COLLISIONS = 2
 MAX_HOOK_LENGTH = 400
 FPS = 60
 MOVEMENT_SPEED = 10
