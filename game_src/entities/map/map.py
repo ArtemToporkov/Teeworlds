@@ -18,8 +18,7 @@ class Map:
         self.spawn_position = spawn_position
         self.tile_size = 50
         self.image = pg.image.load(join(ASSETS_PATH, "maps", "background.png"))
-        self.image.set_alpha(128)
-        self.image = pg.transform.scale(self.image, (800, 600))
+        self.image.set_alpha(200)
 
     @classmethod
     def from_dict(cls: Type['Map'], data: dict) -> 'Map':
@@ -91,12 +90,12 @@ class Map:
         offset_x = -camera_x + WINDOW_WIDTH / 2
         offset_y = -camera_y + WINDOW_HEIGHT / 2
 
-        background_width = MAP_WIDTH + WINDOW_WIDTH
-        background_height = MAP_HEIGHT + WINDOW_HEIGHT
+        background_width = WINDOW_WIDTH * 2
+        background_height = WINDOW_HEIGHT * 2
 
         scaled_background = pg.transform.scale(self.image, (background_width, background_height))
 
-        screen.blit(scaled_background, (offset_x - WINDOW_WIDTH / 2, offset_y - WINDOW_HEIGHT / 2))
+        screen.blit(scaled_background, (offset_x - WINDOW_WIDTH / 2, offset_y - WINDOW_HEIGHT / 2 + 300))
 
         for block in self.platforms:
             block.draw(screen, center)
