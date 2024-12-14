@@ -9,7 +9,8 @@ from asyncio import Queue
 
 import pygame
 
-from game_src.constants import FPS, HITBOXES_MODE, SERVER_ADDR, ASSETS_PATH, CURRENT_LEVEL
+from game_src import constants
+from game_src.constants import FPS, SERVER_ADDR, ASSETS_PATH, CURRENT_LEVEL
 from game_src.entities.guns.bullets import Bullet
 from game_src.entities.map.map import Map
 from game_src.entities.player import Player
@@ -31,6 +32,9 @@ class Game:
         self.map = Map.load_from_file(str(Path(__file__).parent.parent / 'maps' / f'{CURRENT_LEVEL}.json'))
         self.player = Player(self.map.spawn_position.x,  self.map.spawn_position.y, 48, 48)
         self.entities = [self.player, *self.map.platforms]
+        self.hitboxes_mode = False
+
+        self.input_cache = ""
 
         config = configparser.ConfigParser()
         config.read(str(Path(__file__).parent / 'config.ini'))
@@ -79,7 +83,7 @@ class Game:
         for first in entities:
             for second in entities:
                 first.interact(second)
-        if HITBOXES_MODE:
+        if self.hitboxes_mode:
             for entity in entities:
                 entity.draw_hitbox(self.screen, self.player)
 
@@ -116,7 +120,29 @@ class Game:
                     self.player.current_weapon = (self.player.current_weapon + 1) % len(self.player.weapons)
 
         pressed_keys = pygame.key.get_pressed()
+        if not self.hitboxes_mode:
+            self._check_for_cheats(pressed_keys)
         self.player.process_keys_and_move(pressed_keys, pygame.mouse.get_pos(), self.map.platforms)
+
+    def _check_for_cheats(self, pressed_keys) -> None:
+        for letter in [
+            (pygame.K_s, "s"),
+            (pygame.K_a, "a"),
+            (pygame.K_k, "k"),
+            (pygame.K_e, "e"),
+            (pygame.K_v, "v"),
+            (pygame.K_i, "i"),
+            (pygame.K_c, "c"),
+            (pygame.K_h, "h")
+        ]:
+            if pressed_keys[letter[0]] and (not self.input_cache or self.input_cache[-1] != letter[1]):
+                self.input_cache += letter[1]
+        if "sakevich" in self.input_cache:
+            print("Hitboxes mode activated")
+            self.hitboxes_mode = True
+            self.player.hitboxes_mode = True
+        if len(self.input_cache) > 50:
+            self.input_cache = ""
 
     def draw(self) -> None:
         self.screen.fill((0, 0, 0))

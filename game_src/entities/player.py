@@ -9,7 +9,7 @@ from pygame.key import ScancodeWrapper
 
 from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, MAX_HP, \
     MAX_DISTANCE_TO_CENTRE_FOR_PLAYER, MAP_WIDTH, MAP_HEIGHT
-from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, HITBOXES_MODE, DELTA_FOR_COLLISIONS, \
+from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, DELTA_FOR_COLLISIONS, \
     MAX_HOOK_LENGTH
 from game_src.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game_src.entities.game_object import GameObject
@@ -36,6 +36,7 @@ class Player(GameObject):
         self.hook_position = None
         self.is_landed = False
         self.hook_vector = None
+        self.hitboxes_mode = False
 
         self.weapons = [
             Pistol(0, 0, 50, 50, os.path.join(ASSETS_PATH, "weapons", "pistol.png")),
@@ -63,7 +64,7 @@ class Player(GameObject):
         new_position = self.get_coordinates_offset_by_center(center)
         if self.hook_position:
             self._draw_hook(screen, center)
-        if HITBOXES_MODE:
+        if self.hitboxes_mode:
             self._draw_move_force_vector(screen)
         self.weapons[self.current_weapon].draw(screen, center)
 
