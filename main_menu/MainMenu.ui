@@ -31,6 +31,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="layoutDirection">
+   <enum>Qt::LeftToRight</enum>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -44,8 +47,8 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>220</y>
+      <x>450</x>
+      <y>240</y>
       <width>371</width>
       <height>261</height>
      </rect>
@@ -150,6 +153,44 @@ QPushButton:pressed {
        </property>
       </widget>
      </item>
+     <item alignment="Qt::AlignHCenter">
+      <widget class="QCheckBox" name="multiplayerCheckBox">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>8</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+         <stylestrategy>PreferAntialias</stylestrategy>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>ArrowCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QCheckBox {
+border: 3px solid #724624; /* Коричневая рамка */
+    background-color: #FFC89C; /* Коричнево-бежевое наполнение */
+    border-radius: 10px; /* Скруглённые углы */
+    padding: 10px; /* Дополнительное пространство внутри кнопки */
+    color: #000000; /* Цвет текста */
+text-alignment: center;
+}</string>
+       </property>
+       <property name="text">
+        <string>Multiplayer</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
    <widget class="QWidget" name="widget" native="true">
@@ -196,7 +237,6 @@ QPushButton:pressed {
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
   <include location="src/background.qrc"/>

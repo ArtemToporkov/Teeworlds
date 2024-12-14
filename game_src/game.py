@@ -16,9 +16,7 @@ from game_src.entities.player import Player
 from game_src.utils.serialization_tools import get_entity
 from geometry.vector import Vector
 from web.network import Network
-
-
-MULTIPLAYER = False
+import configparser
 
 
 class Game:
@@ -33,6 +31,10 @@ class Game:
         self.map = Map.load_from_file(str(Path(__file__).parent.parent / 'maps' / f'{CURRENT_LEVEL}.json'))
         self.player = Player(self.map.spawn_position.x,  self.map.spawn_position.y, 48, 48)
         self.entities = [self.player, *self.map.platforms]
+
+        config = configparser.ConfigParser()
+        config.read(str(Path(__file__).parent / 'config.ini'))
+        self.multiplayer = config.getboolean("Multiplayer", "MULTIPLAYER")
 
         self.network = None
         self.multiplayer_thread = None
@@ -60,7 +62,7 @@ class Game:
             loop.close()
 
     def run(self) -> None:
-        if MULTIPLAYER:
+        if self.multiplayer:
             self.multiplayer_thread = threading.Thread(target=self._run_receive_loop, daemon=True)
             self.multiplayer_thread.start()
 
@@ -105,7 +107,7 @@ class Game:
                 if event.button == 1:  # ЛКМ
                     bullets = self.player.shoot()
                     if bullets:
-                        if MULTIPLAYER:
+                        if self.multiplayer:
                             for bullet in bullets:
                                 asyncio.run(self.network.send(bullet.to_dict()))
                         self.bullets.extend(bullets)

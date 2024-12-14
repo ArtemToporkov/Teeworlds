@@ -14,7 +14,9 @@ import multiprocessing
 from enum import Enum, auto
 
 from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT
+from game_src import game
 from src import background
+
 
 class Buttons(Enum):
     START = auto()
@@ -28,9 +30,11 @@ class MainMenu(QMainWindow):
         self.button_clicked = None
         ui = Path("MainMenu.ui")
         loadUi(ui, self)
+        self._change_multiplayer_mode(0)
         self.startButton.clicked.connect(self._start_game)
         self.editorButton.clicked.connect(self._open_editor)
         self.exitButton.clicked.connect(self.close)
+        self.multiplayerCheckBox.stateChanged.connect(self._change_multiplayer_mode)
         if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
             PyQt5.QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
             # enable highdpi scaling
@@ -57,6 +61,11 @@ class MainMenu(QMainWindow):
     def _open_editor(self) -> None:
         self.button_clicked = Buttons.EDITOR
         self.close()
+
+    def _change_multiplayer_mode(self, state):
+        with open(str(Path(__file__).parent.parent / "game_src" / "config.ini"), "w") as f:
+            f.write("[Multiplayer]\n")
+            f.write(f"MULTIPLAYER = {'True' if state == 2 else 'False'}")
 
 
 def main():
