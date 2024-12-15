@@ -2,7 +2,7 @@ import os.path
 import asyncio
 import socket
 import time
-from _thread import *
+from _thread import start_new_thread
 from os.path import join
 from tkinter import filedialog
 
@@ -10,6 +10,7 @@ from game_src.constants import ASSETS_PATH
 from game_src.entities.map.map import Map
 
 from web.server_src.client import ClientHandler
+from web.server_src.event_generator import EventGenerator
 
 
 class Server:
@@ -27,12 +28,16 @@ class Server:
         self.clock = None
         self.mode = 0
 
+        self.event_generator = EventGenerator(self.entities_to_send)
+
     async def run(self):
         if self.map is None:
             print('Map is not defined')
             return
 
         self.running = True
+
+        start_new_thread(self.event_generator.start_event, ())
         server = await asyncio.start_server(self.handle_client, self.ip, self.port)
         print(f"Server started on {self.ip}:{self.port}")
 

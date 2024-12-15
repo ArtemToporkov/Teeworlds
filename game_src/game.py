@@ -185,6 +185,7 @@ class Game:
                     # print(f'update: {wrap['id']}')
                     self.players[wrap['id']].update_from_wrap(entity)
             elif isinstance(entity, Bullet):
+                print('take bullet')
                 self.bullets.append(entity)
 
     async def receive(self):

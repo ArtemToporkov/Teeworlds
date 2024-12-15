@@ -66,20 +66,18 @@ class ServerUI(QMainWindow):
 
         # Тумблер для рандомных предметов
         self.random_items_checkbox = QCheckBox("Enable Buffs")
-        self.random_items_checkbox.setChecked(False)
+        self.random_items_checkbox.setChecked(True)
         self.random_items_checkbox.stateChanged.connect(self.toggle_random_items)
 
         # Лейблы с информацией
         self.ip_label = QLabel(f"IP: {self.server.ip}")
         self.port_label = QLabel(f"Port: {self.server.port}")
         self.map_label = QLabel("Map: None")
-        self.mode_label = QLabel("Mode: Single")
 
         # Помещаем эллементы на экран
-        for widget in [self.ip_label, self.port_label, self.map_label, self.mode_label, self.random_items_checkbox]:
+        for widget in [self.ip_label, self.port_label, self.map_label, self.random_items_checkbox]:
             layout.addWidget(widget, alignment=Qt.AlignCenter)
 
-        # Кнопка выбора карты
         select_map_btn = QPushButton("Select Map")
         select_map_btn.clicked.connect(self.select_map)
         layout.addWidget(select_map_btn, alignment=Qt.AlignCenter)
@@ -109,17 +107,13 @@ class ServerUI(QMainWindow):
         finally:
             self.server_loop.close()
 
-    def change_mode(self):
-        self.server.change_mode()
-        mode_text = "Single" if self.server.mode == 0 else "Team"
-        self.mode_label.setText(f"Mode: {mode_text}")
-
     def select_map(self):
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Select Map", "./maps", "JSON_files (*.json)"
         )
         if file_path:
             self.server.map = Map.load_from_file(file_path)
+            self.map_label.setText(os.path.basename(file_path))
 
     def preload_map(self):
         path = None
@@ -150,10 +144,8 @@ class ServerUI(QMainWindow):
 
     def toggle_random_items(self, state):
         if state == Qt.Checked:
-            self.server.buff_spawner.enable()
             self.server.event_generator.enable()
         else:
-            self.server.buff_spawner.disable()
             self.server.event_generator.disable()
 
     @staticmethod
