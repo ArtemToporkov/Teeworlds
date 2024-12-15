@@ -1,6 +1,6 @@
 import os
 
-from game_src.entities.guns.bullets import BulletData, Grenade, BlowingBulletData, Bullet, BlowingBullet
+from game_src.entities.guns.bullets import BulletData, BlowingBulletData, Bullet, BlowingBullet
 from game_src.entities.game_object import GameObject
 from geometry.vector import Vector
 from game_src.constants import ASSETS_PATH

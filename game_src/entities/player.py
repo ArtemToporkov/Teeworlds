@@ -12,7 +12,7 @@ from game_src.constants import MOVEMENT_SPEED, ASSETS_PATH
 from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT, GRAVITY, JUMP_STRENGTH, DELTA_FOR_COLLISIONS, \
     MAX_HOOK_LENGTH
 from game_src.entities.game_object import GameObject
-from game_src.entities.guns.bullets import Grenade, Bullet
+from game_src.entities.guns.bullets import Bullet
 from game_src.entities.guns.weapons import MedKit
 from game_src.entities.guns.weapons import Pistol, ShotGun, Rocket
 from game_src.utils.enums import PlayerStates, Collisions, PlayerData, GameObjectData, TypeData
@@ -129,12 +129,6 @@ class Player(GameObject):
                     other.blowing = True
                     # other.alive = False
                     self.hp -= other.damage
-                if (
-                        other.blowing
-                        and (self.position - other.position).length() < other.radius
-                ):
-                    self.hp -= other.damage
-            if isinstance(other, Grenade):
                 if (
                         other.blowing
                         and (self.position - other.position).length() < other.radius

@@ -6,7 +6,6 @@ from game_src.constants import GRAVITY, ASSETS_PATH
 from os.path import join
 from game_src.utils.enums import BulletData, BlowingBulletData, GameObjectData, TypeData
 
-from game_src.entities.guns.effects import Effect
 from geometry.vector import Vector
 
 
@@ -143,26 +142,3 @@ class BlowingBullet(Bullet):
         bullet.direction = Vector(*data[BulletData.DIRECTION.value])
         bullet.velocity = Vector(*data[GameObjectData.VELOCITY.value])
         return bullet
-
-
-class Grenade(Bullet):
-    def __init__(self, x, y, width, height, damage, sprite_path=None):
-        super().__init__(x, y, width, height, damage, sprite_path=sprite_path)
-        self.radius = 250
-        self.blowing = False
-
-    def apply_forces(self):
-        if not self.is_landed:
-            self.velocity = self.velocity + GRAVITY * 0.4
-
-    def update(self):
-        super().update()
-        if self.velocity.length() > 10:
-            self.velocity = self.velocity.normalize() * self.velocity.length()
-        self.direction = self.velocity.normalize()
-        self.frames += 1
-        if self.lifetime > 299:
-            self.blowing = True
-
-    def interact(self, other):
-        pass
