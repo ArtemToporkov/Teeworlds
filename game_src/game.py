@@ -45,6 +45,7 @@ class Game:
             initialize_data_from_server = await network.connect()
             self.id, map_data = initialize_data_from_server['id'], initialize_data_from_server['map']
             self.map = Map.from_dict(map_data)
+            print('Connect successfully')
             return network
         except TypeError:
             print("Server not found")
@@ -132,18 +133,25 @@ class Game:
             to_send['id'] = self.id
             try:
                 await self.network.send(to_send)
+                print('send')
             except Exception as e:
                 print(f"Error sending player state: {e}")
 
             await asyncio.sleep(1 / FPS)
 
     async def process_server_messages(self):
+        self.cycle_send = 1
+
         while True:
             try:
-                data = await self.network.receive()
-                if data:
-                    parsed_data = json.loads(data)
-                    self._process_data(parsed_data)
+                # Чтение строки
+                data = await self.network.reader.readline()
+                parsed_data = json.loads(data.decode('utf-8'))
+                self._process_data(parsed_data)
+
+                print(f'send: {self.cycle_send}')
+                print(f'send: {parsed_data}')
+                self.cycle_send += 1
             except Exception as e:
                 print(f"Error processing server messages: {e}")
 
@@ -151,18 +159,20 @@ class Game:
         ids = []
         for wrap in data:
             entity = get_entity(wrap)
+            print(f'new_data {self.cycle_process}')
+            self.cycle_process += 1
             if isinstance(entity, Player):
                 ids.append(wrap['id'])
                 if wrap['id'] not in self.players.keys():
                     # print(wrap['id'])
                     self.players[wrap['id']] = entity
                 else:
-                    # print(f'update: {wrap['id']}')
                     self.players[wrap['id']].update_from_wrap(entity)
             elif isinstance(entity, Bullet):
                 self.bullets.append(entity)
 
     async def receive(self):
+        self.cycle_process = 1
         await asyncio.gather(
             self.send_player_state(),
             self.process_server_messages()
