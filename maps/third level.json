@@ -1,0 +1,94 @@
+{
+    "spawn_position": [
+        800.0,
+        500.0
+    ],
+    "platforms": [
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 575.0,
+            "pos_y": 861.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 670,
+            "height": 106,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\3.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 1165.0,
+            "pos_y": 1067.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 670,
+            "height": 106,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\3.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 109.0,
+            "pos_y": 1105.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 670,
+            "height": 106,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\3.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": -45.0,
+            "pos_y": 237.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 670,
+            "height": 106,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\3.png"
+        },
+        {
+            "type_entity": "Platform",
+            "id": null,
+            "pos_x": 1117.0,
+            "pos_y": 173.0,
+            "velocity": [
+                0,
+                0
+            ],
+            "width": 670,
+            "height": 106,
+            "direction": [
+                0,
+                1
+            ],
+            "sprite_path": "editor\\3.png"
+        }
+    ],
+    "tile_size": 50
+}

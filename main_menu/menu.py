@@ -11,7 +11,7 @@ import pygame
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.uic import loadUi
-from src import background
+from main_menu.src import background
 
 
 class Buttons(Enum):
@@ -21,10 +21,10 @@ class Buttons(Enum):
 
 
 class MainMenu(QMainWindow):
-    def __init__(self, app: QApplication):
+    def __init__(self):
         super().__init__()
         self.button_clicked = None
-        ui = Path("MainMenu.ui")
+        ui = Path(__file__).parent / "MainMenu.ui"
         loadUi(ui, self)
         self._change_multiplayer_mode(0)
         self.startButton.clicked.connect(self._start_game)
@@ -66,7 +66,7 @@ class MainMenu(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    window = MainMenu(app)
+    window = MainMenu()
     window.show()
     exit_code = app.exec_()
 

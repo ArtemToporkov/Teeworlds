@@ -22,12 +22,6 @@ class Vector:
     def __truediv__(self, coefficient):
         return Vector(self.x / coefficient, self.y / coefficient)
 
-    def __floordiv__(self, coefficient):
-        return Vector(self.x // coefficient, self.y // coefficient)
-
-    def __mod__(self, coefficient):
-        return Vector(self.x % coefficient, self.y % coefficient)
-
     def __neg__(self):
         return Vector(-self.x, -self.y)
 
@@ -38,9 +32,6 @@ class Vector:
 
     def __str__(self):
         return f"(x: {self.x}, y: {self.y})"
-
-    def dot(self, other):
-        return self.x * other.x + self.y * other.y
 
     def normalize(self):
         length = self.length()
@@ -55,10 +46,6 @@ class Vector:
         x = self.x * cos - self.y * sin
         y = self.x * sin + self.y * cos
         return Vector(x, y)
-
-    @property
-    def coordinates(self):
-        return self.x, self.y
 
     def to_tuple(self):
         return self.x, self.y

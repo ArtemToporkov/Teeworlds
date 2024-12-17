@@ -1,11 +1,11 @@
+from pathlib import Path
+print(Path(__file__))
+
 import unittest
 from unittest.mock import MagicMock, patch
-from game_src.entities.guns.bullets import BlowingBullet
+
 from game_src.entities.map.map import Map
-from geometry.vector import Vector
-from web.server_src.event_generator import EventGenerator
 from web.server_src.server import Server
-import asyncio
 
 
 class TestServer(unittest.IsolatedAsyncioTestCase):

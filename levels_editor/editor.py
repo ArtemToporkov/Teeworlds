@@ -1,23 +1,20 @@
 import json
-import os
 import sys
-import time
 from functools import partial
-
-import PyQt5
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWizardPage, QGraphicsScene, QGraphicsPixmapItem, QInputDialog, \
-    QLineEdit, QMessageBox
-from PyQt5.uic import loadUi
 from pathlib import Path
+
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QMainWindow, QApplication, QGraphicsScene, QGraphicsPixmapItem, QInputDialog, \
+    QMessageBox
+from PyQt5.uic import loadUi
 
 from game_src.constants import ASSETS_PATH, MAP_HEIGHT, MAP_WIDTH
 from game_src.entities.map.map import Map
 from game_src.entities.map.platform import Platform
 from geometry.vector import Vector
 from levels_editor.src import src
-from buttons_enum import Buttons
-from styles import MAP_SAVING_DIALOG_STYLE
+from levels_editor.buttons_enum import Buttons
+from levels_editor.styles import MAP_SAVING_DIALOG_STYLE
 
 
 class Editor(QMainWindow):
@@ -43,11 +40,9 @@ class Editor(QMainWindow):
 
     def _on_button_clicked(self, button):
         self.current_selected_item = button.objectName()
-        print(button.objectName())
 
     def _on_map_clicked(self, event):
         placement_position = self.map.mapToScene(event.pos())
-        print(self.platforms)
         match self.current_selected_item:
             case None:
                 return

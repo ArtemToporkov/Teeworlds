@@ -1,11 +1,8 @@
 from game_src.constants import WINDOW_WIDTH, WINDOW_HEIGHT
 from game_src.game import Game
 from pygame import display
+from main_menu import menu
 
 
 if __name__ == '__main__':
-    screen = display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    print(f'width: {WINDOW_WIDTH}, height: {WINDOW_HEIGHT}')
-    game = Game(screen)
-
-    game.run()
+    menu.main()

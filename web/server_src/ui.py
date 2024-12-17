@@ -64,12 +64,10 @@ class ServerUI(QMainWindow):
         self.update_button_image()
         layout.addWidget(self.start_server_btn, alignment=Qt.AlignCenter)
 
-        # Тумблер для рандомных предметов
         self.random_items_checkbox = QCheckBox("Enable Buffs")
         self.random_items_checkbox.setChecked(True)
         self.random_items_checkbox.stateChanged.connect(self.toggle_random_items)
 
-        # Лейблы с информацией
         self.ip_label = QLabel(f"IP: {self.server.ip}")
         self.port_label = QLabel(f"Port: {self.server.port}")
         self.map_label = QLabel("Map: None")
