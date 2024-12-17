@@ -64,9 +64,9 @@ class ServerUI(QMainWindow):
         self.update_button_image()
         layout.addWidget(self.start_server_btn, alignment=Qt.AlignCenter)
 
-        self.random_items_checkbox = QCheckBox("Enable Buffs")
+        self.random_items_checkbox = QCheckBox("Enable events")
         self.random_items_checkbox.setChecked(True)
-        self.random_items_checkbox.stateChanged.connect(self.toggle_random_items)
+        self.random_items_checkbox.stateChanged.connect(self.toggle_random_events)
 
         self.ip_label = QLabel(f"IP: {self.server.ip}")
         self.port_label = QLabel(f"Port: {self.server.port}")
@@ -140,7 +140,7 @@ class ServerUI(QMainWindow):
 
         self.start_server_btn.setIcon(QIcon(pixmap))
 
-    def toggle_random_items(self, state):
+    def toggle_random_events(self, state):
         if state == Qt.Checked:
             self.server.event_generator.enable()
         else:
