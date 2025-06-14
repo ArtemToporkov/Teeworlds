@@ -1,4 +1,5 @@
 # Teeworlds
+<img src="./assets/readme/title.png" alt="Title Image" width="700" height="400"/>
 
 Авторы: Андрей Волков, Артём Топорков
 
